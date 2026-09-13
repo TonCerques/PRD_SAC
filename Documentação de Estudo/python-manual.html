@@ -1,0 +1,4314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual Pessoal de Python — Automação e Dados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/nord.min.css">
+<style>
+/* ===== Tokens ===== */
+:root{
+  --bg: #0B1B2B;
+  --bg-grid: rgba(111, 214, 232, 0.06);
+  --surface: #112A40;
+  --surface-2: #16324A;
+  --surface-3: #1B3A54;
+  --border: rgba(143, 175, 196, 0.16);
+  --border-strong: rgba(143, 175, 196, 0.30);
+  --text: #EAF3FA;
+  --text-muted: #93AEC2;
+  --text-faint: #5E7A8E;
+  --accent: #6FD6E8;
+  --accent-dim: rgba(111, 214, 232, 0.14);
+  --amber: #E2954F;
+  --amber-dim: rgba(226, 149, 79, 0.14);
+  --rose: #E08585;
+  --font-display: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --sidebar-w: 300px;
+  --header-h: 64px;
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+
+body{
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* faint blueprint grid across the whole page */
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.6;
+}
+
+a{ color: var(--accent); text-decoration: none; }
+a:hover{ text-decoration: underline; }
+
+::selection{ background: var(--accent-dim); color: var(--text); }
+
+/* ===== Top bar (mobile) ===== */
+.topbar{
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: var(--header-h);
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: rgba(11, 27, 43, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar .brand{ font-family: var(--font-mono); font-size: 14px; color: var(--accent); letter-spacing: 0.02em; }
+.menu-btn{
+  background: none; border: 1px solid var(--border-strong); color: var(--text);
+  width: 36px; height: 36px; border-radius: 4px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.menu-btn span, .menu-btn span::before, .menu-btn span::after{
+  content: ""; display: block; width: 16px; height: 1.5px; background: var(--text); position: relative;
+  box-shadow: 0 -5px 0 var(--text), 0 5px 0 var(--text);
+}
+
+/* ===== Layout ===== */
+.layout{ display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+/* ===== Sidebar ===== */
+.sidebar{
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, var(--surface), var(--bg));
+  border-right: 1px solid var(--border);
+  padding: 28px 0 60px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.sidebar::-webkit-scrollbar{ width: 6px; }
+.sidebar::-webkit-scrollbar-thumb{ background: var(--border-strong); border-radius: 3px; }
+
+.sidebar-header{ padding: 0 24px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.sidebar-header .tag{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--amber); display: block; margin-bottom: 8px;
+}
+.sidebar-header h1{
+  font-family: var(--font-display); font-size: 19px; line-height: 1.3; margin: 0 0 6px;
+  color: var(--text); font-weight: 600;
+}
+.sidebar-header p{ font-size: 12.5px; color: var(--text-muted); margin: 0; }
+
+.search-wrap{ padding: 0 24px 16px; }
+.search-wrap input{
+  width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--font-mono); font-size: 12.5px;
+  padding: 9px 12px; border-radius: 4px; outline: none;
+}
+.search-wrap input::placeholder{ color: var(--text-faint); }
+.search-wrap input:focus{ border-color: var(--accent); }
+
+.nav-group-label{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-faint); padding: 14px 24px 6px;
+}
+
+nav.toc{ display: flex; flex-direction: column; }
+nav.toc a{
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 6px 24px; color: var(--text-muted); font-size: 13.5px;
+  border-left: 2px solid transparent; text-decoration: none;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+nav.toc a .n{ font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); flex-shrink: 0; width: 34px; }
+nav.toc a:hover{ background: var(--surface-2); color: var(--text); }
+nav.toc a.active{ color: var(--accent); border-left-color: var(--accent); background: var(--accent-dim); }
+nav.toc a.active .n{ color: var(--accent); }
+nav.toc a.extra .n{ color: var(--amber); }
+
+/* ===== Main content ===== */
+main{ flex: 1; min-width: 0; }
+.content-wrap{
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 72px 40px 140px;
+}
+
+/* Hero */
+.hero{ margin-bottom: 56px; }
+.hero .eyebrow{
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+}
+.hero .eyebrow::before{ content: ""; width: 22px; height: 1px; background: var(--amber); display: inline-block; }
+.hero h1{
+  font-family: var(--font-display); font-size: clamp(32px, 5vw, 46px); font-weight: 600;
+  line-height: 1.12; margin: 0 0 18px; color: var(--text);
+}
+.hero .lede{ font-size: 17px; color: var(--text-muted); max-width: 60ch; margin: 0 0 28px; }
+.hero .stats{ display: flex; gap: 28px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--border); }
+.hero .stat b{ display: block; font-family: var(--font-mono); font-size: 22px; color: var(--accent); }
+.hero .stat span{ font-size: 11.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Typography inside content */
+main h2{
+  font-family: var(--font-display); font-weight: 600; font-size: 27px; color: var(--text);
+  margin: 64px 0 20px; padding-top: 8px; scroll-margin-top: 24px;
+}
+main h2:first-of-type{ margin-top: 0; }
+main h3{
+  font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--text);
+  margin: 36px 0 12px; scroll-margin-top: 24px;
+}
+main p{ color: #C9D8E3; margin: 0 0 16px; }
+main ul, main ol{ color: #C9D8E3; margin: 0 0 16px; padding-left: 22px; }
+main li{ margin-bottom: 6px; }
+main strong{ color: var(--text); font-weight: 600; }
+main hr{ border: none; border-top: 1px solid var(--border); margin: 56px 0; }
+main blockquote{
+  margin: 0 0 20px; padding: 14px 18px; border-left: 3px solid var(--amber);
+  background: var(--amber-dim); color: var(--text); border-radius: 0 4px 4px 0; font-size: 15px;
+}
+
+/* Module heading badge (signature element) */
+h2.module-heading{
+  display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+  border-top: 1px solid var(--border); padding-top: 36px; margin-top: 72px;
+}
+h2.module-heading .mod-badge{
+  font-family: var(--font-mono); font-size: 13px; color: var(--bg); background: var(--accent);
+  padding: 3px 9px; border-radius: 3px; letter-spacing: 0.04em; flex-shrink: 0;
+}
+h2.module-heading .mod-title{ font-family: var(--font-display); }
+
+/* Quick reference sections */
+h3.quick-ref{
+  font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.1em;
+  color: var(--amber); text-transform: none; margin-top: 44px;
+  display: flex; align-items: center; gap: 10px;
+}
+h3.quick-ref::before{ content: "▤"; font-size: 13px; }
+h3.quick-ref + div.table-wrap table{ border-color: var(--amber-dim); }
+h3.quick-ref + div.table-wrap{ box-shadow: 0 0 0 1px var(--amber-dim); border-radius: 6px; }
+
+/* Tables */
+.table-wrap{ overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--border); border-radius: 6px; }
+table{ width: 100%; border-collapse: collapse; font-size: 14px; }
+thead{ background: var(--surface-2); }
+th{
+  text-align: left; padding: 10px 14px; color: var(--accent); font-family: var(--font-mono);
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td{ padding: 9px 14px; border-bottom: 1px solid var(--border); color: #C9D8E3; vertical-align: top; }
+td code, th code{ white-space: nowrap; }
+tbody tr:last-child td{ border-bottom: none; }
+tbody tr:hover{ background: var(--surface-2); }
+
+/* Inline code */
+main :not(pre) > code{
+  font-family: var(--font-mono); background: var(--surface-2); color: var(--accent);
+  padding: 1.5px 6px; border-radius: 3px; font-size: 0.87em; border: 1px solid var(--border);
+}
+
+/* Code blocks */
+.code-block{ position: relative; margin: 0 0 22px; }
+pre{
+  background: #0E2436; border: 1px solid var(--border); border-radius: 8px;
+  padding: 18px 18px; overflow-x: auto; margin: 0;
+  font-family: var(--font-mono); font-size: 13.3px; line-height: 1.6;
+}
+pre code{ background: none; border: none; padding: 0; color: #DCE8F0; font-family: var(--font-mono); }
+.copy-btn{
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  background: var(--surface-3); color: var(--text-muted); border: 1px solid var(--border-strong);
+  padding: 5px 9px; border-radius: 4px; cursor: pointer; opacity: 0; transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+}
+.code-block:hover .copy-btn{ opacity: 1; }
+.copy-btn:hover{ color: var(--accent); border-color: var(--accent); }
+.copy-btn.copied{ color: var(--accent); border-color: var(--accent); opacity: 1; }
+
+/* Back to top */
+.back-to-top{
+  position: fixed; bottom: 28px; right: 28px; z-index: 30;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--surface-3); border: 1px solid var(--border-strong); color: var(--accent);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+}
+.back-to-top.visible{ opacity: 1; pointer-events: auto; }
+.back-to-top:hover{ transform: translateY(-2px); }
+
+/* footer */
+.doc-footer{
+  margin-top: 90px; padding-top: 26px; border-top: 1px solid var(--border);
+  font-size: 12.5px; color: var(--text-faint); font-family: var(--font-mono);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+
+/* sidebar overlay for mobile */
+.sidebar-overlay{ display: none; }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  .topbar{ display: flex; }
+  .layout{ display: block; }
+  .sidebar{
+    position: fixed; top: 0; left: 0; height: 100vh; z-index: 50;
+    transform: translateX(-100%); transition: transform 0.22s ease;
+    box-shadow: 20px 0 40px rgba(0,0,0,0.4);
+  }
+  .sidebar.open{ transform: translateX(0); }
+  .sidebar-overlay{
+    display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 45;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .sidebar-overlay.open{ opacity: 1; pointer-events: auto; }
+  .content-wrap{ padding: 40px 22px 100px; }
+  h2.module-heading{ margin-top: 52px; padding-top: 24px; }
+  main h2{ font-size: 23px; margin-top: 48px; }
+  .hero .stats{ gap: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *{ transition: none !important; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu"><span></span></button>
+  <span class="brand">manual_python.py</span>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="tag">Referência pessoal</span>
+      <h1>Python para Automação &amp; Dados</h1>
+      <p>Sua memória externa de sintaxe. Não é curso — é consulta.</p>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Filtrar módulos... (ex: pandas, csv)">
+    </div>
+
+    <div class="nav-group-label">Módulos</div>
+    <nav class="toc">
+<a href="#modulo-1"><span class="n">01</span>Python essencial</a>
+<a href="#modulo-2"><span class="n">02</span>Estruturação de lógica</a>
+<a href="#modulo-3"><span class="n">03</span>Strings</a>
+<a href="#modulo-4"><span class="n">04</span>Listas, dicionários e estruturas</a>
+<a href="#modulo-5"><span class="n">05</span>Arquivos e diretórios</a>
+<a href="#modulo-6"><span class="n">06</span>CSV</a>
+<a href="#modulo-7"><span class="n">07</span>JSON</a>
+<a href="#modulo-8"><span class="n">08</span>Datas e horários</a>
+<a href="#modulo-9"><span class="n">09</span>Expressões regulares</a>
+<a href="#modulo-10"><span class="n">10</span>Tratamento de erros</a>
+<a href="#modulo-11"><span class="n">11</span>Módulos e ambiente</a>
+<a href="#modulo-12"><span class="n">12</span>Pandas</a>
+<a href="#modulo-13"><span class="n">13</span>openpyxl / Excel</a>
+<a href="#modulo-14"><span class="n">14</span>Requests e APIs</a>
+<a href="#modulo-15"><span class="n">15</span>Web scraping</a>
+<a href="#modulo-16"><span class="n">16</span>Banco de dados</a>
+<a href="#modulo-17"><span class="n">17</span>Automação de processos</a>
+<a href="#modulo-18"><span class="n">18</span>Logging</a>
+<a href="#modulo-19"><span class="n">19</span>Estrutura de projetos</a>
+<a href="#modulo-20"><span class="n">20</span>Testes</a>
+<a href="#modulo-21"><span class="n">21</span>Boas práticas</a>
+<a href="#modulo-22"><span class="n">22</span>Depuração</a>
+<a href="#modulo-23"><span class="n">23</span>Como não depender de IA</a>
+<a href="#modulo-24"><span class="n">24</span>Orquestração (Prefect)</a>
+<a href="#modulo-25"><span class="n">25</span>Selenium</a>
+<a href="#modulo-26"><span class="n">26</span>Documentos (PDF / Word)</a>
+<a href="#modulo-27"><span class="n">27</span>Pipelines e dashboards</a>
+<a class="extra" href="#padroes"><span class="n">&gt;_</span>Catálogo de padrões</a>
+<a class="extra" href="#desafios"><span class="n">01-07</span>Desafios progressivos</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="content-wrap">
+
+      <div class="hero">
+        <span class="eyebrow">Manual de referência · Python 3.11+</span>
+        <h1>Manual Pessoal de Python<br>Automação &amp; Dados</h1>
+        <p class="lede">Você sabe o que quer fazer — só não lembra como escrever. Este manual existe para preencher exatamente essa lacuna: sintaxe, métodos e padrões de automação, orquestração, geração de documentos e visualização de dados, sem teoria de curso.</p>
+        <div class="stats">
+          <div class="stat"><b>27</b><span>Módulos</span></div>
+          <div class="stat"><b>7</b><span>Desafios progressivos</span></div>
+          <div class="stat"><b>21</b><span>Padrões de código prontos</span></div>
+        </div>
+      </div>
+
+<h2>Como usar este manual</h2>
+<p>Você já sabe programar. Este documento não vai te ensinar lógica — vai te lembrar <strong>sintaxe, métodos e padrões</strong> que você já usou antes e esqueceu. Use assim:</p>
+<ol>
+<li>Saiba o que você quer fazer ("preciso ler um Excel e filtrar linhas").</li>
+<li>Vá direto ao módulo pelo índice.</li>
+<li>Copie o padrão, adapte, siga em frente.</li>
+<li>As seções <strong>CONSULTA RÁPIDA</strong> no fim de cada módulo são feitas para ficarem abertas ao lado do editor.</li>
+</ol>
+<p>Sempre que houver "forma rápida" vs "forma correta para projeto real", isso é dito explicitamente — decida você, conforme o contexto.</p>
+<p><a id="modulo-1"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-01</span><span class="mod-title">Python essencial para quem já sabe programar</span></h2>
+<p>Revisão de sintaxe, sem teoria de curso. Testado em <strong>Python 3.11+</strong> (recursos mais novos são marcados).</p>
+<h3>Variáveis, tipos e operadores</h3>
+<pre><code class="language-python">nome = &quot;Ana&quot;            # str
+idade = 25               # int
+salario = 3500.50        # float
+ativo = True              # bool
+nada = None                # ausência de valor
+
+# múltipla atribuição
+x, y = 10, 20
+x, y = y, x               # swap sem variável temporária
+</code></pre>
+<p><strong>Operadores que travam a memória:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Operador</th>
+<th>Faz o quê</th>
+<th>Cuidado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>==</code></td>
+<td>compara valor</td>
+<td>não confundir com <code>is</code></td>
+</tr>
+<tr>
+<td><code>is</code></td>
+<td>compara identidade (mesmo objeto na memória)</td>
+<td>use só com <code>None</code>, <code>True</code>, <code>False</code></td>
+</tr>
+<tr>
+<td><code>in</code></td>
+<td>testa pertencimento</td>
+<td>funciona em list, dict (chaves), str, set</td>
+</tr>
+<tr>
+<td><code>not in</code></td>
+<td>negação de <code>in</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>//</code></td>
+<td>divisão inteira</td>
+<td><code>7 // 2</code> = <code>3</code></td>
+</tr>
+<tr>
+<td><code>%</code></td>
+<td>módulo (resto)</td>
+<td><code>7 % 2</code> = <code>1</code></td>
+</tr>
+<tr>
+<td><code>**</code></td>
+<td>potência</td>
+<td><code>2 ** 10</code> = <code>1024</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Erro comum:</strong> usar <code>x == None</code> em vez de <code>x is None</code> (funciona, mas não é idiomático — <code>is None</code> é o padrão porque <code>None</code> é singleton).</p>
+<h3>Booleanos, truthy/falsy</h3>
+<p>Em <code>if</code>, Python avalia "verdade" sem precisar comparar explicitamente:</p>
+<pre><code class="language-python">lista = []
+if lista:          # False porque lista vazia é falsy
+    ...
+
+nome = &quot;&quot;
+if not nome:       # True porque string vazia é falsy
+    print(&quot;nome não informado&quot;)
+</code></pre>
+<p><strong>Valores falsy:</strong> <code>0</code>, <code>0.0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>()</code>, <code>set()</code>, <code>None</code>, <code>False</code>.
+<strong>Quando usar:</strong> validações rápidas de "está vazio/ausente".
+<strong>Quando NÃO usar:</strong> quando <code>0</code> ou <code>""</code> forem valores válidos que você precisa distinguir de "ausente" — aí compare explicitamente (<code>if valor is None</code>).</p>
+<h3>if / elif / else</h3>
+<pre><code class="language-python">if idade &lt; 18:
+    categoria = &quot;menor&quot;
+elif idade &lt; 60:
+    categoria = &quot;adulto&quot;
+else:
+    categoria = &quot;idoso&quot;
+</code></pre>
+<p><strong>Operador ternário</strong> (útil para atribuições curtas, evite em condições complexas):</p>
+<pre><code class="language-python">status = &quot;ativo&quot; if usuario[&quot;ativo&quot;] else &quot;inativo&quot;
+</code></pre>
+<h3>for, while, range, enumerate</h3>
+<pre><code class="language-python">for i in range(5):            # 0,1,2,3,4
+    print(i)
+
+for i in range(2, 10, 2):     # início, fim (exclusivo), passo
+    print(i)
+
+for indice, valor in enumerate([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]):
+    print(indice, valor)      # 0 a, 1 b, 2 c
+
+for indice, valor in enumerate([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;], start=1):
+    print(indice, valor)      # 1 a, 2 b, 3 c
+</code></pre>
+<pre><code class="language-python">tentativas = 0
+while tentativas &lt; 3:
+    tentativas += 1
+</code></pre>
+<p><strong><code>break</code> / <code>continue</code> / <code>else</code> do loop</strong> (pouco lembrado):</p>
+<pre><code class="language-python">for arquivo in arquivos:
+    if arquivo.suffix == &quot;.tmp&quot;:
+        continue         # pula esse item
+    if arquivo.name == &quot;STOP&quot;:
+        break             # sai do loop
+else:
+    print(&quot;terminou sem break&quot;)   # só roda se o loop NÃO teve break
+</code></pre>
+<h3>Funções, parâmetros, return</h3>
+<pre><code class="language-python">def calcular_desconto(preco, percentual=10):
+    &quot;&quot;&quot;Aplica desconto percentual sobre o preço.&quot;&quot;&quot;
+    return preco - (preco * percentual / 100)
+
+calcular_desconto(100)          # usa o default: 90.0
+calcular_desconto(100, 20)      # 80.0
+calcular_desconto(preco=100, percentual=20)  # por nome
+</code></pre>
+<p><strong>Quando usar parâmetro default:</strong> valores opcionais com comportamento razoável na maioria dos casos.
+<strong>Erro clássico:</strong> default mutável.</p>
+<pre><code class="language-python"># ERRADO — a lista é criada UMA vez e compartilhada entre chamadas
+def adicionar(item, lista=[]):
+    lista.append(item)
+    return lista
+
+# CERTO
+def adicionar(item, lista=None):
+    if lista is None:
+        lista = []
+    lista.append(item)
+    return lista
+</code></pre>
+<h3><code>*args</code> e <code>**kwargs</code></h3>
+<pre><code class="language-python">def somar(*numeros):            # vira tupla
+    return sum(numeros)
+
+somar(1, 2, 3)                   # 6
+
+def configurar(**opcoes):        # vira dict
+    for chave, valor in opcoes.items():
+        print(chave, valor)
+
+configurar(host=&quot;localhost&quot;, porta=8080)
+</code></pre>
+<p><strong>Quando usar:</strong> funções que encaminham argumentos para outra função (wrappers), ou número variável de entradas.
+<strong>Quando NÃO usar:</strong> se você sabe exatamente quais parâmetros existem — nomeie-os, é mais legível.</p>
+<h3>list, tuple, set, dict — visão rápida</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Estrutura</th>
+<th>Mutável?</th>
+<th>Ordenada?</th>
+<th>Duplicatas?</th>
+<th>Quando usar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list</code></td>
+<td>sim</td>
+<td>sim</td>
+<td>sim</td>
+<td>sequência que muda</td>
+</tr>
+<tr>
+<td><code>tuple</code></td>
+<td>não</td>
+<td>sim</td>
+<td>sim</td>
+<td>dado fixo, retorno múltiplo de função</td>
+</tr>
+<tr>
+<td><code>set</code></td>
+<td>sim</td>
+<td>não</td>
+<td>não</td>
+<td>checar pertencimento rápido, remover duplicatas</td>
+</tr>
+<tr>
+<td><code>dict</code></td>
+<td>sim</td>
+<td>sim (desde 3.7)</td>
+<td>chaves não</td>
+<td>associação chave→valor</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-python">coordenadas = (23.5, -46.6)          # tuple — não muda mais
+vistos = set()                        # set — controle de duplicados
+vistos.add(&quot;cliente_001&quot;)
+if &quot;cliente_001&quot; in vistos:           # O(1), muito mais rápido que &quot;in lista&quot;
+    ...
+</code></pre>
+<h3>Comprehensions</h3>
+<pre><code class="language-python">nomes_maiusculos = [n.upper() for n in nomes]
+pares = [n for n in numeros if n % 2 == 0]
+mapa = {c[&quot;id&quot;]: c[&quot;nome&quot;] for c in clientes}
+unicos = {c[&quot;cidade&quot;] for c in clientes}
+</code></pre>
+<p><strong>Quando usar:</strong> transformação/filtro simples, uma linha lógica.
+<strong>Quando NÃO usar:</strong> se precisa de mais de uma condição complexa ou vários passos — vira ilegível. Prefira loop normal ou função nomeada.</p>
+<pre><code class="language-python"># ilegível — não faça isso
+resultado = [x for x in dados if x['ativo'] for y in x['itens'] if y &gt; 0]
+
+# melhor: função nomeada, mesmo que &quot;mais linhas&quot;
+def itens_validos(dados):
+    resultado = []
+    for x in dados:
+        if not x[&quot;ativo&quot;]:
+            continue
+        resultado.extend(y for y in x[&quot;itens&quot;] if y &gt; 0)
+    return resultado
+</code></pre>
+<h3>Unpacking</h3>
+<pre><code class="language-python">a, b, c = [1, 2, 3]
+primeiro, *resto = [1, 2, 3, 4]     # primeiro=1, resto=[2,3,4]
+*inicio, ultimo = [1, 2, 3, 4]       # inicio=[1,2,3], ultimo=4
+
+def coordenadas():
+    return 10, 20                     # na verdade retorna uma tuple
+
+x, y = coordenadas()
+</code></pre>
+<h3>f-strings</h3>
+<pre><code class="language-python">nome, idade = &quot;Ana&quot;, 25
+print(f&quot;{nome} tem {idade} anos&quot;)
+print(f&quot;{3.14159:.2f}&quot;)             # 3.14 — formatação numérica
+print(f&quot;{1000000:,}&quot;)                # 1,000,000
+print(f&quot;{valor:&gt;10}&quot;)                # alinhado à direita, largura 10
+print(f&quot;{nome=}&quot;)                     # nome='Ana' — ótimo para debug (3.8+)
+</code></pre>
+<h3><code>in</code>, <code>is</code>, <code>not</code> na prática de dados</h3>
+<pre><code class="language-python">if &quot;email&quot; in registro:              # chave existe no dict?
+    ...
+if registro.get(&quot;status&quot;) not in (&quot;cancelado&quot;, &quot;excluido&quot;):
+    ...
+</code></pre>
+<h3>lambda (só quando realmente útil)</h3>
+<pre><code class="language-python">clientes.sort(key=lambda c: c[&quot;idade&quot;])
+maior = max(produtos, key=lambda p: p[&quot;preco&quot;])
+</code></pre>
+<p><strong>Quando usar:</strong> função de uma linha passada como argumento (<code>key=</code>, <code>sorted</code>, <code>filter</code>, <code>map</code>).
+<strong>Quando NÃO usar:</strong> se a lógica não cabe numa linha clara — crie uma função <code>def</code> com nome.</p>
+<h3>Escopo, módulos, imports</h3>
+<pre><code class="language-python">import pandas as pd
+from pathlib import Path
+from datetime import datetime, timedelta
+import meu_modulo as mm
+</code></pre>
+<p>Escopo: variável criada dentro de função não existe fora. Para alterar uma variável de módulo dentro de uma função, use <code>global</code> (evite — prefira retornar valores).</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 1</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>swap de variáveis</td>
+<td><code>a, b = b, a</code></td>
+</tr>
+<tr>
+<td>range com passo</td>
+<td><code>range(0, 10, 2)</code></td>
+</tr>
+<tr>
+<td>índice + valor no loop</td>
+<td><code>enumerate(lista)</code></td>
+</tr>
+<tr>
+<td>função com default</td>
+<td><code>def f(x, y=10):</code></td>
+</tr>
+<tr>
+<td>argumentos variáveis</td>
+<td><code>def f(*args, **kwargs):</code></td>
+</tr>
+<tr>
+<td>list comprehension</td>
+<td><code>[x for x in lista if cond]</code></td>
+</tr>
+<tr>
+<td>dict comprehension</td>
+<td><code>{k: v for k, v in pares}</code></td>
+</tr>
+<tr>
+<td>set (sem duplicata)</td>
+<td><code>set(lista)</code></td>
+</tr>
+<tr>
+<td>desempacotar resto</td>
+<td><code>primeiro, *resto = lista</code></td>
+</tr>
+<tr>
+<td>ordenar por chave</td>
+<td><code>sorted(lista, key=lambda x: x["campo"])</code></td>
+</tr>
+<tr>
+<td>formatar número</td>
+<td><code>f"{valor:.2f}"</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-2"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-02</span><span class="mod-title">Estruturação de lógica (o módulo mais importante)</span></h2>
+<p>O objetivo aqui é reconstruir sua capacidade de ir de <strong>"eu sei o que quero"</strong> até <strong>código funcionando</strong>, sem IA.</p>
+<h3>O fluxo universal de qualquer automação</h3>
+<pre><code>ENTRADA → VALIDAÇÃO → PROCESSAMENTO → TRANSFORMAÇÃO → SAÍDA
+</code></pre>
+<p>Praticamente todo script de automação/dados segue isso. Antes de escrever qualquer linha, responda:</p>
+<ol>
+<li><strong>Entrada</strong>: de onde vêm os dados? (arquivo, API, banco, input do usuário)</li>
+<li><strong>Validação</strong>: o que pode estar errado nos dados de entrada?</li>
+<li><strong>Processamento</strong>: o que precisa ser calculado/filtrado/combinado?</li>
+<li><strong>Transformação</strong>: em que formato final os dados devem estar?</li>
+<li><strong>Saída</strong>: para onde vai o resultado? (arquivo, planilha, banco, e-mail)</li>
+</ol>
+<h3>Exemplo de decomposição real</h3>
+<p><strong>Problema:</strong> "Preciso ler uma planilha de vendas, remover linhas inválidas, calcular o total por vendedor e salvar um resumo."</p>
+<p><strong>Como pensar (antes de codar):</strong></p>
+<pre><code>ENTRADA:      arquivo Excel &quot;vendas.xlsx&quot;
+VALIDAÇÃO:    linha sem valor numérico? vendedor vazio? valor negativo?
+PROCESSAMENTO: agrupar por vendedor, somar valores
+TRANSFORMAÇÃO: transformar em tabela vendedor -&gt; total
+SAÍDA:        salvar &quot;resumo_vendas.xlsx&quot;
+</code></pre>
+<p><strong>Isso vira funções pequenas, cada uma com UMA responsabilidade:</strong></p>
+<pre><code class="language-python">def carregar_vendas(caminho):
+    ...
+
+def validar_linha(linha):
+    ...
+
+def calcular_total_por_vendedor(vendas):
+    ...
+
+def salvar_resumo(resumo, caminho_saida):
+    ...
+
+def main():
+    vendas = carregar_vendas(&quot;vendas.xlsx&quot;)
+    vendas_validas = [v for v in vendas if validar_linha(v)]
+    resumo = calcular_total_por_vendedor(vendas_validas)
+    salvar_resumo(resumo, &quot;resumo_vendas.xlsx&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Note: <code>main()</code> só <strong>orquestra</strong> — ele não faz cálculo nenhum. Isso é separar lógica de negócio de entrada/saída, e é o que torna o código testável e fácil de debugar.</p>
+<h3>Quando criar uma função</h3>
+<p>Crie uma função quando:
+- você repetiria o mesmo bloco de código em outro lugar;
+- um trecho tem um nome óbvio ("validar linha", "calcular total") — se você consegue nomear, é sinal de que é uma unidade lógica;
+- você quer testar essa parte isoladamente;
+- a função <code>main</code>/o script está passando de ~20-30 linhas.</p>
+<p><strong>Sinal de função gigante demais:</strong> se você precisa rolar a tela para ler ela inteira, ou se o nome da função precisaria de "e" ("processar_e_validar_e_salvar") — quebre em partes.</p>
+<h3>Como decidir a estrutura de dados</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Situação</th>
+<th>Estrutura</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vários registros parecidos (linhas de planilha)</td>
+<td><code>list[dict]</code></td>
+</tr>
+<tr>
+<td>associar uma chave a um valor único</td>
+<td><code>dict</code></td>
+</tr>
+<tr>
+<td>preciso checar "já vi isso?" muitas vezes</td>
+<td><code>set</code></td>
+</tr>
+<tr>
+<td>dado fixo que não muda (coordenada, RGB)</td>
+<td><code>tuple</code></td>
+</tr>
+<tr>
+<td>preciso contar ocorrências</td>
+<td><code>dict</code> ou <code>collections.Counter</code></td>
+</tr>
+<tr>
+<td>preciso agrupar por categoria</td>
+<td><code>dict</code> de listas (<code>{"categoria": [itens]}</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Pseudocódigo como ferramenta, não enfeite</h3>
+<p>Antes de escrever Python, escreva 5 linhas em português do que o código vai fazer. Isso é mais rápido que "tentar direto" e economiza tempo de debug:</p>
+<pre><code>para cada arquivo na pasta:
+    se não for .csv: pular
+    ler o csv
+    se tiver coluna &quot;valor&quot; negativa: pular linha
+    somar valor na categoria correta
+salvar resultado em novo arquivo
+</code></pre>
+<p>Isso já quase vira o <code>for</code> + <code>if</code> diretamente.</p>
+<h3>Separar lógica de negócio de entrada/saída</h3>
+<p><strong>Ruim</strong> (mistura tudo):</p>
+<pre><code class="language-python">def processar():
+    with open(&quot;dados.csv&quot;) as f:
+        linhas = f.readlines()
+    total = 0
+    for linha in linhas:
+        valor = float(linha.split(&quot;,&quot;)[2])
+        total += valor
+    print(f&quot;Total: {total}&quot;)
+</code></pre>
+<p><strong>Melhor</strong> (lógica isolada, testável sem precisar de arquivo):</p>
+<pre><code class="language-python">def calcular_total(valores: list[float]) -&gt; float:
+    return sum(valores)
+
+def extrair_valores(linhas: list[str]) -&gt; list[float]:
+    return [float(linha.split(&quot;,&quot;)[2]) for linha in linhas]
+
+def main():
+    with open(&quot;dados.csv&quot;) as f:
+        linhas = f.readlines()
+    valores = extrair_valores(linhas)
+    total = calcular_total(valores)
+    print(f&quot;Total: {total}&quot;)
+</code></pre>
+<p>Agora <code>calcular_total([10, 20, 30])</code> pode ser testado sem nenhum arquivo.</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 2</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pergunta ao planejar</th>
+<th>Serve para</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>De onde vêm os dados?</td>
+<td>definir entrada</td>
+</tr>
+<tr>
+<td>O que pode vir errado?</td>
+<td>definir validação</td>
+</tr>
+<tr>
+<td>O que precisa ser calculado/combinado?</td>
+<td>definir processamento</td>
+</tr>
+<tr>
+<td>Qual o formato final?</td>
+<td>definir transformação</td>
+</tr>
+<tr>
+<td>Para onde isso vai?</td>
+<td>definir saída</td>
+</tr>
+<tr>
+<td>Eu nomearia esse trecho com um verbo claro?</td>
+<td>é candidato a função</td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="modulo-3"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-03</span><span class="mod-title">Strings</span></h2>
+<h3>Slicing</h3>
+<pre><code class="language-python">texto = &quot;AUTOMACAO&quot;
+texto[0:4]      # &quot;AUTO&quot;
+texto[-4:]      # &quot;MACAO&quot; -&gt; na verdade &quot;MACAO&quot;[-4:] = &quot;MACAO&quot;[:] cuidado, veja abaixo
+texto[::-1]     # inverte a string: &quot;OACAMOTUA&quot;
+texto[::2]      # pula de 2 em 2
+</code></pre>
+<h3>Métodos essenciais</h3>
+<pre><code class="language-python">&quot;joão silva&quot;.title()             # &quot;João Silva&quot;
+&quot;  texto  &quot;.strip()               # &quot;texto&quot; (remove espaços das pontas)
+&quot;a,b,c&quot;.split(&quot;,&quot;)                 # [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+&quot;,&quot;.join([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;])          # &quot;a,b,c&quot;
+&quot;Relatorio&quot;.replace(&quot;o&quot;, &quot;0&quot;)      # &quot;Relat0ri0&quot;
+&quot;cliente&quot;.startswith(&quot;cli&quot;)        # True
+&quot;relatorio.csv&quot;.endswith(&quot;.csv&quot;)   # True
+&quot;ABC&quot;.lower()                       # &quot;abc&quot;
+&quot;abc&quot;.upper()                       # &quot;ABC&quot;
+&quot;123&quot;.isdigit()                     # True
+&quot;12.3&quot;.isdigit()                    # False (ponto não é dígito)
+&quot;abc123&quot;.isalnum()                  # True
+</code></pre>
+<p><strong>Erro comum:</strong> achar que <code>.strip()</code> remove espaços do meio — só remove das pontas. Para o meio, use <code>.replace(" ", "")</code> ou regex.</p>
+<h3>Formatação numérica em f-string</h3>
+<pre><code class="language-python">preco = 1234.5
+f&quot;{preco:.2f}&quot;        # &quot;1234.50&quot;
+f&quot;{preco:,.2f}&quot;        # &quot;1,234.50&quot;
+f&quot;{preco:&gt;10.2f}&quot;      # alinhado à direita, largura 10
+f&quot;{0.256:.1%}&quot;          # &quot;25.6%&quot;
+</code></pre>
+<h3>split com limite e strip em lote</h3>
+<pre><code class="language-python">&quot;nome; idade ; cidade&quot;.split(&quot;;&quot;)                      # com espaços sobrando
+[p.strip() for p in &quot;nome; idade ; cidade&quot;.split(&quot;;&quot;)]  # limpo
+
+&quot;a=b=c&quot;.split(&quot;=&quot;, 1)     # [&quot;a&quot;, &quot;b=c&quot;] — maxsplit
+</code></pre>
+<h3>Verificações combinadas úteis em validação de dados</h3>
+<pre><code class="language-python">def cpf_valido_formato(cpf: str) -&gt; bool:
+    cpf = cpf.replace(&quot;.&quot;, &quot;&quot;).replace(&quot;-&quot;, &quot;&quot;)
+    return cpf.isdigit() and len(cpf) == 11
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 3</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>separar texto</td>
+<td><code>.split(sep)</code></td>
+</tr>
+<tr>
+<td>juntar textos</td>
+<td><code>sep.join(lista)</code></td>
+</tr>
+<tr>
+<td>remover espaços das pontas</td>
+<td><code>.strip()</code></td>
+</tr>
+<tr>
+<td>remover espaços à esquerda/direita</td>
+<td><code>.lstrip()</code> / <code>.rstrip()</code></td>
+</tr>
+<tr>
+<td>substituir trecho</td>
+<td><code>.replace(antigo, novo)</code></td>
+</tr>
+<tr>
+<td>verificar início/fim</td>
+<td><code>.startswith()</code> / <code>.endswith()</code></td>
+</tr>
+<tr>
+<td>deixar minúsculo/maiúsculo</td>
+<td><code>.lower()</code> / <code>.upper()</code></td>
+</tr>
+<tr>
+<td>capitalizar</td>
+<td><code>.title()</code> / <code>.capitalize()</code></td>
+</tr>
+<tr>
+<td>checar se é só número</td>
+<td><code>.isdigit()</code></td>
+</tr>
+<tr>
+<td>encontrar posição</td>
+<td><code>.find(sub)</code> (-1 se não achar)</td>
+</tr>
+<tr>
+<td>contar ocorrências</td>
+<td><code>.count(sub)</code></td>
+</tr>
+<tr>
+<td>remover prefixo/sufixo (3.9+)</td>
+<td><code>.removeprefix()</code> / <code>.removesuffix()</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-4"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-04</span><span class="mod-title">Listas, dicionários e estruturas de dados</span></h2>
+<p>Esse é o módulo que você mais vai usar no dia a dia com dados. A maior parte dos seus dados reais vai parecer com isto:</p>
+<pre><code class="language-python">clientes = [
+    {&quot;nome&quot;: &quot;João&quot;, &quot;idade&quot;: 25, &quot;cidade&quot;: &quot;Salvador&quot;, &quot;ativo&quot;: True},
+    {&quot;nome&quot;: &quot;Maria&quot;, &quot;idade&quot;: 31, &quot;cidade&quot;: &quot;Recife&quot;, &quot;ativo&quot;: False},
+    {&quot;nome&quot;: &quot;Pedro&quot;, &quot;idade&quot;: 40, &quot;cidade&quot;: &quot;Salvador&quot;, &quot;ativo&quot;: True},
+]
+</code></pre>
+<h3>Acesso, alteração, inserção, remoção</h3>
+<pre><code class="language-python">clientes[0]                      # primeiro dict
+clientes[0][&quot;nome&quot;]              # &quot;João&quot;
+clientes[0][&quot;idade&quot;] = 26        # altera
+clientes.append({&quot;nome&quot;: &quot;Lia&quot;, &quot;idade&quot;: 22, &quot;cidade&quot;: &quot;Salvador&quot;, &quot;ativo&quot;: True})
+clientes.pop(0)                   # remove e retorna o primeiro
+clientes.pop()                    # remove e retorna o último
+del clientes[1]                    # remove por índice, sem retornar
+clientes.remove(clientes[0])       # remove por valor (o objeto exato)
+clientes.insert(0, {&quot;nome&quot;: &quot;X&quot;})  # insere numa posição específica
+</code></pre>
+<h3>Dicionários — acesso seguro</h3>
+<pre><code class="language-python">registro = {&quot;nome&quot;: &quot;Ana&quot;}
+
+registro[&quot;idade&quot;]           # KeyError se não existir
+registro.get(&quot;idade&quot;)        # None se não existir
+registro.get(&quot;idade&quot;, 0)     # 0 se não existir (default)
+
+for chave, valor in registro.items():
+    print(chave, valor)
+
+registro.keys()               # dict_keys(['nome'])
+registro.values()             # dict_values(['Ana'])
+
+registro.setdefault(&quot;tags&quot;, []).append(&quot;vip&quot;)   # cria a chave se não existir, e usa
+</code></pre>
+<p><strong>Quando usar <code>.get()</code> em vez de <code>[]</code>:</strong> sempre que a chave pode não existir e você não quer que o programa quebre — comum em dados vindos de API/planilha inconsistente.</p>
+<h3>Filtrar, transformar, agrupar, consultar (o que você mais vai fazer)</h3>
+<pre><code class="language-python"># filtrar
+ativos = [c for c in clientes if c[&quot;ativo&quot;]]
+de_salvador = [c for c in clientes if c[&quot;cidade&quot;] == &quot;Salvador&quot;]
+
+# transformar (extrair um campo)
+nomes = [c[&quot;nome&quot;] for c in clientes]
+
+# agrupar por cidade (sem pandas)
+from collections import defaultdict
+por_cidade = defaultdict(list)
+for c in clientes:
+    por_cidade[c[&quot;cidade&quot;]].append(c)
+# por_cidade[&quot;Salvador&quot;] -&gt; lista de clientes de Salvador
+
+# contar por categoria
+from collections import Counter
+contagem = Counter(c[&quot;cidade&quot;] for c in clientes)   # Counter({'Salvador': 2, 'Recife': 1})
+
+# consultar (achar o primeiro que bate com uma condição)
+primeiro_inativo = next((c for c in clientes if not c[&quot;ativo&quot;]), None)
+
+# ordenar
+por_idade = sorted(clientes, key=lambda c: c[&quot;idade&quot;])
+por_idade_desc = sorted(clientes, key=lambda c: c[&quot;idade&quot;], reverse=True)
+</code></pre>
+<h3>Listas dentro de dicionários / dicionários dentro de listas</h3>
+<pre><code class="language-python">pedido = {
+    &quot;cliente&quot;: &quot;João&quot;,
+    &quot;itens&quot;: [
+        {&quot;produto&quot;: &quot;Caneta&quot;, &quot;qtd&quot;: 2, &quot;preco&quot;: 1.5},
+        {&quot;produto&quot;: &quot;Caderno&quot;, &quot;qtd&quot;: 1, &quot;preco&quot;: 15.0},
+    ]
+}
+
+total_pedido = sum(item[&quot;qtd&quot;] * item[&quot;preco&quot;] for item in pedido[&quot;itens&quot;])
+</code></pre>
+<h3>Métodos e funções que você vai esquecer com frequência</h3>
+<pre><code class="language-python">len(clientes)                      # tamanho
+sum(c[&quot;idade&quot;] for c in clientes)   # soma (precisa de generator, não lista de dict)
+min(clientes, key=lambda c: c[&quot;idade&quot;])
+max(clientes, key=lambda c: c[&quot;idade&quot;])
+any(c[&quot;ativo&quot;] for c in clientes)    # True se PELO MENOS UM ativo
+all(c[&quot;ativo&quot;] for c in clientes)    # True se TODOS ativos
+
+lista.sort(key=lambda x: x[&quot;idade&quot;])       # ordena NA PRÓPRIA lista, retorna None
+nova = sorted(lista, key=lambda x: x[&quot;idade&quot;])  # retorna lista NOVA, não muda a original
+
+lista.extend([1, 2, 3])             # adiciona vários itens (não uma sublista)
+lista.append([1, 2, 3])             # adiciona UMA sublista como item único — erro comum
+
+zip(nomes, idades)                    # combina duas listas em pares
+list(zip([&quot;a&quot;, &quot;b&quot;], [1, 2]))          # [('a', 1), ('b', 2)]
+dict(zip([&quot;a&quot;, &quot;b&quot;], [1, 2]))           # {'a': 1, 'b': 2}
+</code></pre>
+<p><strong>Erro clássico <code>.append</code> vs <code>.extend</code>:</strong></p>
+<pre><code class="language-python">resultado = []
+resultado.append([1, 2, 3])    # resultado = [[1, 2, 3]]  &lt;- errado se você queria &quot;achatado&quot;
+resultado.extend([1, 2, 3])    # resultado = [1, 2, 3]     &lt;- correto para &quot;juntar itens&quot;
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 4</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>acesso seguro a chave</td>
+<td><code>d.get("chave", default)</code></td>
+</tr>
+<tr>
+<td>filtrar lista de dicts</td>
+<td><code>[x for x in lista if x["campo"] == valor]</code></td>
+</tr>
+<tr>
+<td>extrair um campo de todos</td>
+<td><code>[x["campo"] for x in lista]</code></td>
+</tr>
+<tr>
+<td>agrupar por chave</td>
+<td><code>defaultdict(list)</code> + loop</td>
+</tr>
+<tr>
+<td>contar ocorrências</td>
+<td><code>Counter(x["campo"] for x in lista)</code></td>
+</tr>
+<tr>
+<td>achar primeiro que bate</td>
+<td><code>next((x for x in lista if cond), None)</code></td>
+</tr>
+<tr>
+<td>ordenar por campo</td>
+<td><code>sorted(lista, key=lambda x: x["campo"])</code></td>
+</tr>
+<tr>
+<td>somar campo numérico</td>
+<td><code>sum(x["campo"] for x in lista)</code></td>
+</tr>
+<tr>
+<td>checar se algum bate</td>
+<td><code>any(cond for x in lista)</code></td>
+</tr>
+<tr>
+<td>checar se todos batem</td>
+<td><code>all(cond for x in lista)</code></td>
+</tr>
+<tr>
+<td>combinar duas listas</td>
+<td><code>zip(lista1, lista2)</code></td>
+</tr>
+<tr>
+<td>remover duplicatas mantendo ordem</td>
+<td><code>list(dict.fromkeys(lista))</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-5"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-05</span><span class="mod-title">Arquivos e diretórios</span></h2>
+<p>Use <strong><code>pathlib</code></strong>. Não há motivo para <code>os.path</code> em código novo — <code>pathlib</code> é mais legível e orientado a objeto.</p>
+<h3>Path básico</h3>
+<pre><code class="language-python">from pathlib import Path
+
+p = Path(&quot;dados/vendas/janeiro.csv&quot;)
+
+p.exists()           # existe no disco?
+p.is_file()           # é arquivo?
+p.is_dir()            # é pasta?
+p.suffix              # &quot;.csv&quot;
+p.stem                # &quot;janeiro&quot; (nome sem extensão)
+p.name                # &quot;janeiro.csv&quot;
+p.parent              # Path(&quot;dados/vendas&quot;)
+
+Path.cwd()             # diretório atual
+Path.home()            # pasta do usuário
+p.resolve()            # caminho absoluto
+</code></pre>
+<h3>Construindo caminhos (nunca concatene string com "/")</h3>
+<pre><code class="language-python">pasta = Path(&quot;relatorios&quot;)
+arquivo = pasta / &quot;2026&quot; / &quot;janeiro.xlsx&quot;    # o operador / monta o caminho certo no SO
+</code></pre>
+<h3>Criar, renomear, apagar</h3>
+<pre><code class="language-python">pasta.mkdir(exist_ok=True)              # cria, não dá erro se já existir
+pasta.mkdir(parents=True, exist_ok=True) # cria pastas intermediárias também
+
+arquivo.rename(pasta / &quot;novo_nome.xlsx&quot;)
+
+arquivo.unlink(missing_ok=True)          # apaga arquivo (3.8+)
+pasta.rmdir()                             # apaga pasta VAZIA
+import shutil
+shutil.rmtree(pasta)                       # apaga pasta com conteúdo
+shutil.copy(origem, destino)                # copiar arquivo
+shutil.move(origem, destino)                # mover arquivo/pasta
+</code></pre>
+<h3>Listar e buscar arquivos</h3>
+<pre><code class="language-python">for item in pasta.iterdir():              # lista direta, um nível
+    print(item)
+
+for csv in pasta.glob(&quot;*.csv&quot;):            # só arquivos .csv naquele nível
+    print(csv)
+
+for csv in pasta.rglob(&quot;*.csv&quot;):           # busca em TODAS as subpastas (recursivo)
+    print(csv)
+
+pdfs = list(pasta.glob(&quot;*.pdf&quot;))
+</code></pre>
+<h3>Ler e escrever arquivos de texto</h3>
+<pre><code class="language-python">texto = Path(&quot;nota.txt&quot;).read_text(encoding=&quot;utf-8&quot;)
+Path(&quot;saida.txt&quot;).write_text(&quot;conteúdo&quot;, encoding=&quot;utf-8&quot;)
+
+with open(&quot;dados.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+    linhas = f.readlines()             # lista de linhas com \n
+    # ou: conteudo = f.read()          # tudo como uma string única
+
+with open(&quot;saida.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+    f.write(&quot;primeira linha\n&quot;)
+
+with open(&quot;log.txt&quot;, &quot;a&quot;, encoding=&quot;utf-8&quot;) as f:   # 'a' = append, não sobrescreve
+    f.write(&quot;nova entrada\n&quot;)
+</code></pre>
+<p><strong>Sempre especifique <code>encoding="utf-8"</code> explicitamente.</strong> No Windows o default pode ser <code>cp1252</code>, o que quebra acentos.</p>
+<h3>Padrões reais de automação</h3>
+<p><strong>Organizar Downloads por extensão:</strong></p>
+<pre><code class="language-python">from pathlib import Path
+import shutil
+
+def organizar_por_extensao(pasta_origem: Path):
+    for arquivo in pasta_origem.iterdir():
+        if not arquivo.is_file():
+            continue
+        extensao = arquivo.suffix.lstrip(&quot;.&quot;).lower() or &quot;sem_extensao&quot;
+        pasta_destino = pasta_origem / extensao
+        pasta_destino.mkdir(exist_ok=True)
+        shutil.move(str(arquivo), str(pasta_destino / arquivo.name))
+
+organizar_por_extensao(Path.home() / &quot;Downloads&quot;)
+</code></pre>
+<p><strong>Renomear arquivos em massa (adicionar prefixo com data):</strong></p>
+<pre><code class="language-python">from datetime import date
+
+def renomear_com_data(pasta: Path):
+    hoje = date.today().isoformat()
+    for arquivo in pasta.glob(&quot;*.csv&quot;):
+        novo_nome = f&quot;{hoje}_{arquivo.name}&quot;
+        arquivo.rename(arquivo.parent / novo_nome)
+</code></pre>
+<p><strong>Encontrar arquivos maiores que X MB:</strong></p>
+<pre><code class="language-python">def arquivos_grandes(pasta: Path, limite_mb=10):
+    limite_bytes = limite_mb * 1024 * 1024
+    return [f for f in pasta.rglob(&quot;*&quot;) if f.is_file() and f.stat().st_size &gt; limite_bytes]
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 5</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>criar Path</td>
+<td><code>Path("pasta/arquivo.txt")</code></td>
+</tr>
+<tr>
+<td>juntar caminhos</td>
+<td><code>pasta / "sub" / "arquivo.txt"</code></td>
+</tr>
+<tr>
+<td>checar existência</td>
+<td><code>p.exists()</code></td>
+</tr>
+<tr>
+<td>criar pasta</td>
+<td><code>p.mkdir(parents=True, exist_ok=True)</code></td>
+</tr>
+<tr>
+<td>listar um nível</td>
+<td><code>p.iterdir()</code></td>
+</tr>
+<tr>
+<td>buscar por extensão (recursivo)</td>
+<td><code>p.rglob("*.csv")</code></td>
+</tr>
+<tr>
+<td>ler texto</td>
+<td><code>p.read_text(encoding="utf-8")</code></td>
+</tr>
+<tr>
+<td>escrever texto</td>
+<td><code>p.write_text(texto, encoding="utf-8")</code></td>
+</tr>
+<tr>
+<td>abrir para leitura</td>
+<td><code>open(p, "r", encoding="utf-8")</code></td>
+</tr>
+<tr>
+<td>abrir para escrita (sobrescreve)</td>
+<td><code>open(p, "w", encoding="utf-8")</code></td>
+</tr>
+<tr>
+<td>abrir para acrescentar</td>
+<td><code>open(p, "a", encoding="utf-8")</code></td>
+</tr>
+<tr>
+<td>copiar arquivo</td>
+<td><code>shutil.copy(origem, destino)</code></td>
+</tr>
+<tr>
+<td>mover arquivo</td>
+<td><code>shutil.move(origem, destino)</code></td>
+</tr>
+<tr>
+<td>apagar arquivo</td>
+<td><code>p.unlink(missing_ok=True)</code></td>
+</tr>
+<tr>
+<td>apagar pasta com conteúdo</td>
+<td><code>shutil.rmtree(p)</code></td>
+</tr>
+<tr>
+<td>tamanho do arquivo</td>
+<td><code>p.stat().st_size</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-6"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-06</span><span class="mod-title">CSV</span></h2>
+<h3>Leitura simples com <code>csv.DictReader</code> (o que você vai usar 90% do tempo)</h3>
+<pre><code class="language-python">import csv
+
+with open(&quot;vendas.csv&quot;, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+    leitor = csv.DictReader(f)          # cada linha vira um dict {coluna: valor}
+    vendas = list(leitor)
+
+vendas[0][&quot;produto&quot;]     # acesso pelo nome da coluna
+</code></pre>
+<p><code>newline=""</code> no <code>open()</code> é recomendado pela documentação do módulo <code>csv</code> para evitar linhas em branco extras no Windows.</p>
+<h3>Escrita com <code>DictWriter</code></h3>
+<pre><code class="language-python">campos = [&quot;produto&quot;, &quot;quantidade&quot;, &quot;preco&quot;]
+
+with open(&quot;saida.csv&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+    escritor = csv.DictWriter(f, fieldnames=campos)
+    escritor.writeheader()
+    for linha in dados:
+        escritor.writerow(linha)
+    # ou de uma vez: escritor.writerows(dados)
+</code></pre>
+<h3><code>csv.reader</code> / <code>csv.writer</code> (quando não tem cabeçalho ou você quer listas em vez de dicts)</h3>
+<pre><code class="language-python">with open(&quot;dados.csv&quot;, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+    leitor = csv.reader(f)
+    cabecalho = next(leitor)         # pula e guarda a primeira linha
+    for linha in leitor:
+        print(linha[0], linha[2])     # acesso por índice
+
+with open(&quot;saida.csv&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+    escritor = csv.writer(f)
+    escritor.writerow([&quot;produto&quot;, &quot;preco&quot;])
+    escritor.writerows([[&quot;Caneta&quot;, 1.5], [&quot;Caderno&quot;, 15.0]])
+</code></pre>
+<h3>Delimitador diferente (<code>;</code> é comum em CSV de Excel Brasil)</h3>
+<pre><code class="language-python">leitor = csv.DictReader(f, delimiter=&quot;;&quot;)
+escritor = csv.DictWriter(f, fieldnames=campos, delimiter=&quot;;&quot;)
+</code></pre>
+<h3>Validação e transformação típica</h3>
+<pre><code class="language-python">def carregar_vendas_validas(caminho):
+    with open(caminho, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+        linhas = list(csv.DictReader(f))
+
+    validas = []
+    for linha in linhas:
+        try:
+            linha[&quot;preco&quot;] = float(linha[&quot;preco&quot;])
+            linha[&quot;quantidade&quot;] = int(linha[&quot;quantidade&quot;])
+        except (ValueError, KeyError):
+            continue    # ignora linha malformada
+        if linha[&quot;preco&quot;] &lt; 0:
+            continue
+        validas.append(linha)
+    return validas
+</code></pre>
+<p><strong>Nota:</strong> <code>csv.DictReader</code> sempre entrega valores como <code>str</code>. Se precisar de número, você <strong>precisa converter</strong> (<code>float()</code>, <code>int()</code>) — esquecer isso é o erro mais comum de quem volta a mexer com CSV.</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 6</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ler CSV como dicts</td>
+<td><code>csv.DictReader(f)</code></td>
+</tr>
+<tr>
+<td>ler CSV como listas</td>
+<td><code>csv.reader(f)</code></td>
+</tr>
+<tr>
+<td>escrever de dicts</td>
+<td><code>csv.DictWriter(f, fieldnames=campos)</code></td>
+</tr>
+<tr>
+<td>escrever cabeçalho</td>
+<td><code>escritor.writeheader()</code></td>
+</tr>
+<tr>
+<td>escrever uma linha</td>
+<td><code>escritor.writerow(dict_ou_lista)</code></td>
+</tr>
+<tr>
+<td>escrever várias linhas</td>
+<td><code>escritor.writerows(lista)</code></td>
+</tr>
+<tr>
+<td>trocar delimitador</td>
+<td><code>delimiter=";"</code></td>
+</tr>
+<tr>
+<td>converter coluna para número</td>
+<td><code>float(linha["preco"])</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="modulo-7"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-07</span><span class="mod-title">JSON</span></h2>
+<p>JSON em Python vira <code>dict</code>/<code>list</code>. É basicamente a "língua" das APIs.</p>
+<h3>Leitura</h3>
+<pre><code class="language-python">import json
+
+with open(&quot;config.json&quot;, encoding=&quot;utf-8&quot;) as f:
+    config = json.load(f)          # de ARQUIVO para dict/list
+
+texto = '{&quot;nome&quot;: &quot;Ana&quot;, &quot;idade&quot;: 25}'
+dados = json.loads(texto)          # de STRING para dict/list
+</code></pre>
+<h3>Escrita</h3>
+<pre><code class="language-python">with open(&quot;saida.json&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+    json.dump(dados, f, ensure_ascii=False, indent=2)   # para ARQUIVO
+
+texto = json.dumps(dados, ensure_ascii=False, indent=2)  # para STRING
+</code></pre>
+<ul>
+<li><code>ensure_ascii=False</code>: mantém acentos legíveis (<code>"João"</code> em vez de <code>"Jo\u00e3o"</code>).</li>
+<li><code>indent=2</code>: formata bonito para leitura humana. Omita em produção se o tamanho do arquivo importar.</li>
+</ul>
+<h3>Estruturas aninhadas (o normal em resposta de API)</h3>
+<pre><code class="language-python">resposta = {
+    &quot;cliente&quot;: {&quot;id&quot;: 1, &quot;nome&quot;: &quot;João&quot;},
+    &quot;pedidos&quot;: [
+        {&quot;id&quot;: 100, &quot;itens&quot;: [{&quot;produto&quot;: &quot;Caneta&quot;, &quot;qtd&quot;: 2}]},
+        {&quot;id&quot;: 101, &quot;itens&quot;: []},
+    ]
+}
+
+resposta[&quot;cliente&quot;][&quot;nome&quot;]                  # &quot;João&quot;
+resposta[&quot;pedidos&quot;][0][&quot;itens&quot;][0][&quot;produto&quot;]  # &quot;Caneta&quot;
+
+# navegação segura quando a estrutura pode variar
+resposta.get(&quot;cliente&quot;, {}).get(&quot;telefone&quot;, &quot;não informado&quot;)
+</code></pre>
+<h3>Dados ausentes / campos que podem não existir</h3>
+<pre><code class="language-python">for pedido in resposta[&quot;pedidos&quot;]:
+    itens = pedido.get(&quot;itens&quot;, [])     # default = lista vazia, evita KeyError
+    if not itens:
+        continue
+</code></pre>
+<p><strong>Erro comum:</strong> <code>json.loads</code> falha (<code>json.JSONDecodeError</code>) se a string não for JSON válido — comum quando uma API retorna HTML de erro em vez de JSON. Trate isso (veja Módulo 10).</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 7</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ler JSON de arquivo</td>
+<td><code>json.load(f)</code></td>
+</tr>
+<tr>
+<td>ler JSON de string</td>
+<td><code>json.loads(texto)</code></td>
+</tr>
+<tr>
+<td>escrever JSON em arquivo</td>
+<td><code>json.dump(dados, f, ensure_ascii=False, indent=2)</code></td>
+</tr>
+<tr>
+<td>gerar string JSON</td>
+<td><code>json.dumps(dados, ensure_ascii=False)</code></td>
+</tr>
+<tr>
+<td>acesso seguro aninhado</td>
+<td><code>d.get("a", {}).get("b", default)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-8"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-08</span><span class="mod-title">Datas e horários</span></h2>
+<pre><code class="language-python">from datetime import datetime, date, time, timedelta
+</code></pre>
+<h3>Criar e obter datas</h3>
+<pre><code class="language-python">agora = datetime.now()               # data e hora atuais
+hoje = date.today()                    # só data
+
+data_especifica = datetime(2026, 8, 11, 14, 30)   # ano, mes, dia, hora, min
+</code></pre>
+<h3>Parsing (string → datetime) e formatação (datetime → string)</h3>
+<pre><code class="language-python"># string -&gt; datetime
+d = datetime.strptime(&quot;11/08/2026&quot;, &quot;%d/%m/%Y&quot;)
+d2 = datetime.strptime(&quot;2026-08-11 14:30&quot;, &quot;%Y-%m-%d %H:%M&quot;)
+
+# datetime -&gt; string
+d.strftime(&quot;%d/%m/%Y&quot;)            # &quot;11/08/2026&quot;
+d.strftime(&quot;%Y-%m-%d&quot;)             # &quot;2026-08-11&quot;
+d.strftime(&quot;%d/%m/%Y %H:%M:%S&quot;)    # com hora
+</code></pre>
+<p><strong>Tabela de códigos mais usados:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Significa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%d</code></td>
+<td>dia (01-31)</td>
+</tr>
+<tr>
+<td><code>%m</code></td>
+<td>mês (01-12)</td>
+</tr>
+<tr>
+<td><code>%Y</code></td>
+<td>ano com 4 dígitos</td>
+</tr>
+<tr>
+<td><code>%y</code></td>
+<td>ano com 2 dígitos</td>
+</tr>
+<tr>
+<td><code>%H</code></td>
+<td>hora (00-23)</td>
+</tr>
+<tr>
+<td><code>%M</code></td>
+<td>minuto</td>
+</tr>
+<tr>
+<td><code>%S</code></td>
+<td>segundo</td>
+</tr>
+<tr>
+<td><code>%B</code></td>
+<td>nome do mês por extenso (em inglês, salvo locale)</td>
+</tr>
+<tr>
+<td><code>%A</code></td>
+<td>nome do dia da semana</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Diferença entre datas, somar/subtrair</h3>
+<pre><code class="language-python">prazo = datetime(2026, 12, 31)
+diferenca = prazo - datetime.now()
+diferenca.days                      # quantos dias faltam
+
+daqui_30_dias = datetime.now() + timedelta(days=30)
+uma_hora_atras = datetime.now() - timedelta(hours=1)
+</code></pre>
+<h3>Comparação</h3>
+<pre><code class="language-python">if data_pedido &lt; data_limite:
+    print(&quot;dentro do prazo&quot;)
+</code></pre>
+<h3>Timestamp (comum em APIs/logs)</h3>
+<pre><code class="language-python">datetime.now().timestamp()                    # float, segundos desde 1970
+datetime.fromtimestamp(1723399200)             # de volta para datetime
+</code></pre>
+<h3>Timezone (quando relevante — ex.: comparar com API que retorna UTC)</h3>
+<pre><code class="language-python">from datetime import timezone
+
+agora_utc = datetime.now(timezone.utc)
+</code></pre>
+<p>Para regras de fuso horário mais complexas (ex.: horário de Brasília com histórico de DST), use a biblioteca <code>zoneinfo</code> (nativa desde Python 3.9):</p>
+<pre><code class="language-python">from zoneinfo import ZoneInfo
+agora_bahia = datetime.now(ZoneInfo(&quot;America/Bahia&quot;))
+</code></pre>
+<h3>Situações reais</h3>
+<pre><code class="language-python"># nome de arquivo com data de hoje
+nome_arquivo = f&quot;relatorio_{date.today().isoformat()}.csv&quot;   # relatorio_2026-08-11.csv
+
+# filtrar registros dos últimos 7 dias
+limite = datetime.now() - timedelta(days=7)
+recentes = [r for r in registros if r[&quot;data&quot;] &gt;= limite]
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 8</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data/hora atual</td>
+<td><code>datetime.now()</code></td>
+</tr>
+<tr>
+<td>só data de hoje</td>
+<td><code>date.today()</code></td>
+</tr>
+<tr>
+<td>string → data</td>
+<td><code>datetime.strptime(texto, "%d/%m/%Y")</code></td>
+</tr>
+<tr>
+<td>data → string</td>
+<td><code>data.strftime("%d/%m/%Y")</code></td>
+</tr>
+<tr>
+<td>somar dias</td>
+<td><code>data + timedelta(days=30)</code></td>
+</tr>
+<tr>
+<td>diferença em dias</td>
+<td><code>(data1 - data2).days</code></td>
+</tr>
+<tr>
+<td>data no nome de arquivo</td>
+<td><code>date.today().isoformat()</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-9"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-09</span><span class="mod-title">Expressões regulares</span></h2>
+<pre><code class="language-python">import re
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Problema</th>
+<th>Regex</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>validar/achar CPF</td>
+<td><code>r"\d{3}\.\d{3}\.\d{3}-\d{2}"</code></td>
+<td><code>re.search(padrao, texto)</code></td>
+</tr>
+<tr>
+<td>achar e-mail</td>
+<td><code>r"[\w.+-]+@[\w-]+\.[\w.-]+"</code></td>
+<td><code>re.findall(padrao, texto)</code></td>
+</tr>
+<tr>
+<td>achar só números</td>
+<td><code>r"\d+"</code></td>
+<td><code>re.findall(r"\d+", texto)</code></td>
+</tr>
+<tr>
+<td>achar telefone (com DDD)</td>
+<td><code>r"\(?\d{2}\)?\s?\d{4,5}-?\d{4}"</code></td>
+<td><code>re.search(...)</code></td>
+</tr>
+<tr>
+<td>substituir múltiplos espaços por um</td>
+<td><code>r"\s+"</code> → <code>" "</code></td>
+<td><code>re.sub(r"\s+", " ", texto)</code></td>
+</tr>
+<tr>
+<td>remover tudo que não é dígito</td>
+<td><code>r"\D"</code> → <code>""</code></td>
+<td><code>re.sub(r"\D", "", texto)</code></td>
+</tr>
+<tr>
+<td>extrair valor monetário</td>
+<td><code>r"R\$\s?[\d.,]+"</code></td>
+<td><code>re.findall(...)</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3>Funções principais</h3>
+<pre><code class="language-python">re.search(padrao, texto)     # acha a PRIMEIRA ocorrência em qualquer lugar; retorna Match ou None
+re.match(padrao, texto)      # só casa se estiver no INÍCIO da string
+re.findall(padrao, texto)    # retorna TODAS as ocorrências, como lista de strings
+re.sub(padrao, novo, texto)  # substitui todas as ocorrências
+re.split(padrao, texto)      # separa texto usando regex como delimitador
+</code></pre>
+<h3>Grupos (capturar partes específicas)</h3>
+<pre><code class="language-python">m = re.search(r&quot;(\d{2})/(\d{2})/(\d{4})&quot;, &quot;Data: 11/08/2026&quot;)
+if m:
+    dia, mes, ano = m.groups()     # (&quot;11&quot;, &quot;08&quot;, &quot;2026&quot;)
+    # ou individualmente: m.group(1), m.group(2), m.group(3)
+</code></pre>
+<h3>Grupos nomeados (mais legível)</h3>
+<pre><code class="language-python">m = re.search(r&quot;(?P&lt;dia&gt;\d{2})/(?P&lt;mes&gt;\d{2})/(?P&lt;ano&gt;\d{4})&quot;, texto)
+if m:
+    m.group(&quot;ano&quot;)     # &quot;2026&quot;
+</code></pre>
+<h3>Quantificadores essenciais</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Significa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\d</code></td>
+<td>um dígito</td>
+</tr>
+<tr>
+<td><code>\w</code></td>
+<td>letra, dígito ou <code>_</code></td>
+</tr>
+<tr>
+<td><code>\s</code></td>
+<td>espaço/tab/quebra de linha</td>
+</tr>
+<tr>
+<td><code>.</code></td>
+<td>qualquer caractere</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>um ou mais</td>
+</tr>
+<tr>
+<td><code>*</code></td>
+<td>zero ou mais</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>zero ou um (opcional)</td>
+</tr>
+<tr>
+<td><code>{n}</code></td>
+<td>exatamente n vezes</td>
+</tr>
+<tr>
+<td><code>{n,m}</code></td>
+<td>entre n e m vezes</td>
+</tr>
+<tr>
+<td><code>^</code></td>
+<td>início da string</td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td>fim da string</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Regra prática:</strong> se você só precisa checar "tem dígito ou não", <code>.isdigit()</code> é mais simples que regex. Use regex quando o padrão tem <strong>estrutura</strong> (formato de documento, extrair parte específica, validar formato complexo).</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 9</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>achar primeira ocorrência</td>
+<td><code>re.search(padrao, texto)</code></td>
+</tr>
+<tr>
+<td>achar todas</td>
+<td><code>re.findall(padrao, texto)</code></td>
+</tr>
+<tr>
+<td>substituir</td>
+<td><code>re.sub(padrao, novo, texto)</code></td>
+</tr>
+<tr>
+<td>capturar partes</td>
+<td><code>re.search(r"(\d+)-(\d+)", texto).groups()</code></td>
+</tr>
+<tr>
+<td>checar se casou</td>
+<td><code>if re.search(...):</code></td>
+</tr>
+<tr>
+<td>compilar (reusar regex várias vezes)</td>
+<td><code>padrao = re.compile(r"\d+")</code> depois <code>padrao.findall(texto)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-10"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-10</span><span class="mod-title">Tratamento de erros</span></h2>
+<pre><code class="language-python">try:
+    valor = float(linha[&quot;preco&quot;])
+except ValueError:
+    print(f&quot;Preço inválido: {linha['preco']}&quot;)
+    valor = 0.0
+except KeyError:
+    print(&quot;Coluna 'preco' não existe&quot;)
+    valor = 0.0
+else:
+    print(&quot;Conversão OK&quot;)            # só roda se NÃO houve exceção
+finally:
+    print(&quot;Linha processada&quot;)         # roda sempre, com ou sem erro
+</code></pre>
+<h3>Exceções comuns que você vai encontrar em automação/dados</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Exceção</th>
+<th>Quando acontece</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KeyError</code></td>
+<td>acessar chave inexistente em dict com <code>[]</code></td>
+</tr>
+<tr>
+<td><code>ValueError</code></td>
+<td>converter tipo com valor incompatível (<code>float("abc")</code>)</td>
+</tr>
+<tr>
+<td><code>TypeError</code></td>
+<td>operação entre tipos incompatíveis (<code>"1" + 1</code>)</td>
+</tr>
+<tr>
+<td><code>FileNotFoundError</code></td>
+<td>abrir arquivo que não existe</td>
+</tr>
+<tr>
+<td><code>IndexError</code></td>
+<td>acessar índice fora do intervalo de uma lista</td>
+</tr>
+<tr>
+<td><code>json.JSONDecodeError</code></td>
+<td>JSON malformado</td>
+</tr>
+<tr>
+<td><code>requests.exceptions.RequestException</code></td>
+<td>erro de rede/API (módulo 14)</td>
+</tr>
+<tr>
+<td><code>ZeroDivisionError</code></td>
+<td>dividir por zero</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Levantar suas próprias exceções com mensagem útil</h3>
+<pre><code class="language-python">def calcular_desconto(preco, percentual):
+    if percentual &lt; 0 or percentual &gt; 100:
+        raise ValueError(f&quot;Percentual inválido: {percentual}. Esperado entre 0 e 100.&quot;)
+    return preco - (preco * percentual / 100)
+</code></pre>
+<p><strong>Por que fazer isso:</strong> um erro claro no momento certo economiza horas de debug depois. Prefira <code>raise</code> com mensagem específica a deixar o programa continuar com dado errado.</p>
+<h3>Quando capturar, quando não capturar</h3>
+<p><strong>Capture</strong> quando você sabe o que fazer com o erro (pular a linha, usar um valor default, tentar de novo).</p>
+<p><strong>Não capture</strong> (<code>except Exception:</code>) só para "o programa não quebrar" — isso esconde bugs de verdade. Se capturar amplo, sempre logue o erro real:</p>
+<pre><code class="language-python"># RUIM — engole qualquer erro silenciosamente
+try:
+    processar(linha)
+except Exception:
+    pass
+
+# MELHOR — captura específica, ou pelo menos loga o que houve
+try:
+    processar(linha)
+except (ValueError, KeyError) as erro:
+    logger.warning(f&quot;Linha ignorada: {linha} — motivo: {erro}&quot;)
+</code></pre>
+<h3>Erro real de automação — arquivo pode não existir</h3>
+<pre><code class="language-python">from pathlib import Path
+
+caminho = Path(&quot;config.json&quot;)
+if not caminho.exists():
+    raise FileNotFoundError(f&quot;Arquivo de configuração não encontrado: {caminho}&quot;)
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 10</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>capturar erro específico</td>
+<td><code>except ValueError as e:</code></td>
+</tr>
+<tr>
+<td>capturar vários tipos</td>
+<td><code>except (ValueError, KeyError) as e:</code></td>
+</tr>
+<tr>
+<td>rodar só se sem erro</td>
+<td>bloco <code>else:</code></td>
+</tr>
+<tr>
+<td>rodar sempre</td>
+<td>bloco <code>finally:</code></td>
+</tr>
+<tr>
+<td>lançar erro próprio</td>
+<td><code>raise ValueError("mensagem clara")</code></td>
+</tr>
+<tr>
+<td>pegar a mensagem do erro</td>
+<td><code>str(e)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-11"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-11</span><span class="mod-title">Módulos e ambiente</span></h2>
+<h3>Imports</h3>
+<pre><code class="language-python">import pandas as pd                     # módulo inteiro, com apelido
+from pathlib import Path                 # só um nome específico
+from collections import defaultdict, Counter   # vários nomes
+import meu_pacote.utilitarios as utils   # módulo dentro de pacote
+</code></pre>
+<h3>Criando seu próprio módulo</h3>
+<pre><code class="language-python"># arquivo: utilitarios.py
+def limpar_texto(texto):
+    return texto.strip().lower()
+</code></pre>
+<pre><code class="language-python"># arquivo: main.py
+from utilitarios import limpar_texto
+</code></pre>
+<h3><code>__name__ == "__main__"</code></h3>
+<pre><code class="language-python">def main():
+    print(&quot;rodando o script&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Isso garante que <code>main()</code> só executa quando o arquivo é rodado diretamente (<code>python main.py</code>), não quando é importado por outro módulo (<code>import main</code>).</p>
+<h3>Ambientes virtuais e dependências</h3>
+<pre><code class="language-bash">python -m venv .venv                 # cria o ambiente
+source .venv/bin/activate             # ativa (Linux/Mac)
+.venv\Scripts\activate                 # ativa (Windows)
+
+pip install pandas openpyxl requests
+pip freeze &gt; requirements.txt          # salva as versões instaladas
+
+pip install -r requirements.txt        # instala tudo de um requirements.txt
+</code></pre>
+<p><strong>Por que usar venv:</strong> isola as dependências do projeto das dependências globais do sistema — evita conflito de versões entre projetos diferentes.</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 11</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>criar venv</td>
+<td><code>python -m venv .venv</code></td>
+</tr>
+<tr>
+<td>ativar venv (Linux/Mac)</td>
+<td><code>source .venv/bin/activate</code></td>
+</tr>
+<tr>
+<td>instalar biblioteca</td>
+<td><code>pip install nome</code></td>
+</tr>
+<tr>
+<td>congelar dependências</td>
+<td><code>pip freeze &gt; requirements.txt</code></td>
+</tr>
+<tr>
+<td>instalar de requirements</td>
+<td><code>pip install -r requirements.txt</code></td>
+</tr>
+<tr>
+<td>bloco de execução principal</td>
+<td><code>if __name__ == "__main__":</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="modulo-12"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-12</span><span class="mod-title">Pandas</span></h2>
+<p>Testado com <strong>pandas 2.x</strong>. É a biblioteca que você mais vai usar para tratamento de dados tabulares.</p>
+<h3>Como pensar em Pandas (leia isto antes do resto)</h3>
+<p>A diferença entre código Pandas ruim e bom é quase sempre isto:</p>
+<pre><code class="language-python"># RUIM — percorre linha por linha, lento e nada idiomático
+for i in range(len(df)):
+    df.loc[i, &quot;total&quot;] = df.loc[i, &quot;preco&quot;] * df.loc[i, &quot;quantidade&quot;]
+
+# BOM — operação vetorizada, opera na coluna inteira de uma vez
+df[&quot;total&quot;] = df[&quot;preco&quot;] * df[&quot;quantidade&quot;]
+</code></pre>
+<p><strong>Regra prática:</strong> se você está pensando em <code>for linha in df</code>, pare e pergunte "existe uma operação de coluna que faz isso de uma vez?". Quase sempre existe. Loop linha a linha em Pandas costuma ser 10-100x mais lento e é sinal de que você está tratando o DataFrame como se fosse uma lista de dicts.</p>
+<h3>Series e DataFrame</h3>
+<pre><code class="language-python">import pandas as pd
+
+serie = pd.Series([10, 20, 30], name=&quot;vendas&quot;)     # uma coluna
+df = pd.DataFrame({
+    &quot;produto&quot;: [&quot;Caneta&quot;, &quot;Caderno&quot;, &quot;Lápis&quot;],
+    &quot;preco&quot;: [1.5, 15.0, 1.0],
+    &quot;quantidade&quot;: [100, 20, 200],
+})
+</code></pre>
+<h3>Leitura de arquivos</h3>
+<pre><code class="language-python">df = pd.read_csv(&quot;vendas.csv&quot;)
+df = pd.read_csv(&quot;vendas.csv&quot;, sep=&quot;;&quot;, encoding=&quot;utf-8&quot;)
+df = pd.read_csv(&quot;vendas.csv&quot;, decimal=&quot;,&quot;)            # números com vírgula decimal (padrão BR)
+df = pd.read_excel(&quot;vendas.xlsx&quot;, sheet_name=&quot;Janeiro&quot;)
+df = pd.read_excel(&quot;vendas.xlsx&quot;, sheet_name=None)      # dict com TODAS as abas
+</code></pre>
+<h3>Inspeção rápida</h3>
+<pre><code class="language-python">df.head()          # primeiras 5 linhas
+df.tail(10)          # últimas 10
+df.shape             # (linhas, colunas)
+df.columns            # nomes das colunas
+df.dtypes              # tipo de cada coluna
+df.info()               # resumo geral
+df.describe()            # estatísticas das colunas numéricas
+</code></pre>
+<h3>Seleção — colunas e linhas</h3>
+<pre><code class="language-python">df[&quot;preco&quot;]                        # uma coluna (Series)
+df[[&quot;preco&quot;, &quot;quantidade&quot;]]         # várias colunas (DataFrame)
+
+df.loc[0]                            # linha pelo ÍNDICE (rótulo)
+df.loc[0, &quot;preco&quot;]                   # célula específica por rótulo
+df.loc[0:2]                           # fatia por rótulo (INCLUSIVO no fim)
+
+df.iloc[0]                            # linha pela POSIÇÃO numérica
+df.iloc[0, 1]                          # célula por posição
+df.iloc[0:2]                            # fatia por posição (exclusivo no fim, como list)
+</code></pre>
+<p><strong><code>.loc</code> = por rótulo/condição. <code>.iloc</code> = por posição numérica.</strong> Confundir os dois é a fonte de erro mais comum em quem volta a usar pandas.</p>
+<h3>Filtros</h3>
+<pre><code class="language-python">df[df[&quot;preco&quot;] &gt; 10]
+df[(df[&quot;preco&quot;] &gt; 10) &amp; (df[&quot;quantidade&quot;] &lt; 50)]      # E — use &amp; com parênteses em cada condição
+df[(df[&quot;categoria&quot;] == &quot;A&quot;) | (df[&quot;categoria&quot;] == &quot;B&quot;)]  # OU — use |
+df[df[&quot;categoria&quot;].isin([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;])]                # dentro de uma lista de valores
+df[df[&quot;nome&quot;].str.contains(&quot;silva&quot;, case=False, na=False)]  # texto contém (case insensitive)
+df[df[&quot;preco&quot;].notna()]                                    # remove nulos daquela coluna
+df.query(&quot;preco &gt; 10 and quantidade &lt; 50&quot;)                  # alternativa mais legível
+</code></pre>
+<p><strong>Erro clássico:</strong> usar <code>and</code>/<code>or</code> do Python em vez de <code>&amp;</code>/<code>|</code> em filtros de DataFrame — Python puro não funciona em array de valores, precisa dos operadores vetorizados.</p>
+<h3>Criar, renomear, remover colunas</h3>
+<pre><code class="language-python">df[&quot;total&quot;] = df[&quot;preco&quot;] * df[&quot;quantidade&quot;]
+df[&quot;categoria&quot;] = df[&quot;preco&quot;].apply(lambda p: &quot;cara&quot; if p &gt; 10 else &quot;barata&quot;)
+df = df.assign(total=df[&quot;preco&quot;] * df[&quot;quantidade&quot;])   # cria sem alterar df original (encadeável)
+
+df = df.rename(columns={&quot;preco&quot;: &quot;valor_unitario&quot;})
+df = df.drop(columns=[&quot;coluna_inutil&quot;])
+df = df.drop(index=[0, 1])                               # remove linhas pelo índice
+</code></pre>
+<h3>Valores ausentes</h3>
+<pre><code class="language-python">df.isna().sum()                       # quantos nulos por coluna
+df = df.dropna()                        # remove linhas com QUALQUER nulo
+df = df.dropna(subset=[&quot;preco&quot;])        # remove só se &quot;preco&quot; for nulo
+df[&quot;preco&quot;] = df[&quot;preco&quot;].fillna(0)      # preenche nulos com um valor
+df[&quot;cidade&quot;] = df[&quot;cidade&quot;].fillna(&quot;não informado&quot;)
+</code></pre>
+<h3>Conversão de tipos</h3>
+<pre><code class="language-python">df[&quot;preco&quot;] = df[&quot;preco&quot;].astype(float)
+df[&quot;ano&quot;] = df[&quot;ano&quot;].astype(int)
+df[&quot;data&quot;] = pd.to_datetime(df[&quot;data&quot;], format=&quot;%d/%m/%Y&quot;)     # string -&gt; datetime
+df[&quot;ativo&quot;] = df[&quot;ativo&quot;].astype(bool)
+</code></pre>
+<h3><code>.apply()</code> e <code>.map()</code> — quando usar</h3>
+<pre><code class="language-python">df[&quot;categoria&quot;] = df[&quot;preco&quot;].apply(lambda p: &quot;cara&quot; if p &gt; 10 else &quot;barata&quot;)   # função em cada valor de UMA coluna
+df[&quot;resumo&quot;] = df.apply(lambda linha: f&quot;{linha['produto']}: R${linha['preco']}&quot;, axis=1)  # usa VÁRIAS colunas, axis=1
+
+mapa_categorias = {&quot;A&quot;: &quot;Alta&quot;, &quot;B&quot;: &quot;Baixa&quot;}
+df[&quot;categoria_nome&quot;] = df[&quot;categoria&quot;].map(mapa_categorias)     # troca valores usando um dict
+</code></pre>
+<p><strong>Quando usar <code>.apply()</code>:</strong> quando não existe operação vetorizada pronta (ex.: lógica condicional complexa, combinar várias colunas). É mais lento que operação vetorizada direta — prefira <code>df["col"] &gt; 10</code> a <code>.apply(lambda x: x &gt; 10)</code> quando possível.</p>
+<h3>merge, join, concat</h3>
+<pre><code class="language-python">pedidos = pd.DataFrame({&quot;cliente_id&quot;: [1, 2], &quot;valor&quot;: [100, 200]})
+clientes = pd.DataFrame({&quot;id&quot;: [1, 2], &quot;nome&quot;: [&quot;João&quot;, &quot;Maria&quot;]})
+
+pd.merge(pedidos, clientes, left_on=&quot;cliente_id&quot;, right_on=&quot;id&quot;, how=&quot;left&quot;)
+# how: &quot;left&quot;, &quot;right&quot;, &quot;inner&quot;, &quot;outer&quot; — igual JOIN de SQL
+
+pd.concat([df_janeiro, df_fevereiro], ignore_index=True)   # empilha DataFrames (mesmas colunas)
+</code></pre>
+<h3>groupby e agregações</h3>
+<pre><code class="language-python">df.groupby(&quot;categoria&quot;)[&quot;preco&quot;].sum()
+df.groupby(&quot;categoria&quot;)[&quot;preco&quot;].mean()
+df.groupby(&quot;categoria&quot;).agg(
+    total=(&quot;preco&quot;, &quot;sum&quot;),
+    media=(&quot;preco&quot;, &quot;mean&quot;),
+    quantidade=(&quot;produto&quot;, &quot;count&quot;),
+)
+df.groupby([&quot;categoria&quot;, &quot;cidade&quot;])[&quot;preco&quot;].sum()      # agrupar por várias colunas
+df.groupby(&quot;categoria&quot;)[&quot;preco&quot;].sum().reset_index()      # volta a ser DataFrame normal (não índice agrupado)
+</code></pre>
+<h3>Ordenação, contagem, duplicatas</h3>
+<pre><code class="language-python">df.sort_values(&quot;preco&quot;)
+df.sort_values(&quot;preco&quot;, ascending=False)
+df.sort_values([&quot;categoria&quot;, &quot;preco&quot;])
+
+df[&quot;categoria&quot;].value_counts()          # conta ocorrências de cada valor
+
+df.duplicated()                            # True/False por linha duplicada
+df.duplicated(subset=[&quot;cliente_id&quot;])        # duplicata considerando só uma coluna
+df = df.drop_duplicates()
+df = df.drop_duplicates(subset=[&quot;cliente_id&quot;], keep=&quot;first&quot;)
+</code></pre>
+<h3>Strings em colunas (acessor <code>.str</code>)</h3>
+<pre><code class="language-python">df[&quot;nome&quot;] = df[&quot;nome&quot;].str.strip().str.title()
+df[&quot;dominio&quot;] = df[&quot;email&quot;].str.split(&quot;@&quot;).str[1]
+df[&quot;nome_maiusculo&quot;] = df[&quot;nome&quot;].str.upper()
+</code></pre>
+<h3>Datas em colunas (acessor <code>.dt</code>)</h3>
+<pre><code class="language-python">df[&quot;data&quot;] = pd.to_datetime(df[&quot;data&quot;])
+df[&quot;ano&quot;] = df[&quot;data&quot;].dt.year
+df[&quot;mes&quot;] = df[&quot;data&quot;].dt.month
+df[&quot;dia_semana&quot;] = df[&quot;data&quot;].dt.day_name()
+recentes = df[df[&quot;data&quot;] &gt;= pd.Timestamp.now() - pd.Timedelta(days=30)]
+</code></pre>
+<h3>Exportação</h3>
+<pre><code class="language-python">df.to_csv(&quot;saida.csv&quot;, index=False, encoding=&quot;utf-8&quot;)
+df.to_csv(&quot;saida.csv&quot;, index=False, sep=&quot;;&quot;, decimal=&quot;,&quot;)   # formato &quot;planilha BR&quot;
+df.to_excel(&quot;saida.xlsx&quot;, index=False, sheet_name=&quot;Resultado&quot;)
+</code></pre>
+<p><code>index=False</code> quase sempre é o que você quer — sem isso, o Pandas escreve o índice numérico como uma coluna extra.</p>
+<h3>Performance básica</h3>
+<ul>
+<li>Prefira operações vetorizadas (<code>df["col"] * 2</code>) a <code>.apply()</code>, e <code>.apply()</code> a <code>for</code> explícito.</li>
+<li>Ler só as colunas necessárias: <code>pd.read_csv(caminho, usecols=["preco", "produto"])</code>.</li>
+<li>Para arquivos grandes, considere <code>dtype</code> explícito no <code>read_csv</code> para economizar memória, ou <code>chunksize</code> para processar em blocos.</li>
+</ul>
+<p><strong>CONSULTA RÁPIDA — Módulo 12</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ler CSV / Excel</td>
+<td><code>pd.read_csv(caminho)</code> / <code>pd.read_excel(caminho)</code></td>
+</tr>
+<tr>
+<td>ver estrutura</td>
+<td><code>df.info()</code> / <code>df.describe()</code></td>
+</tr>
+<tr>
+<td>selecionar colunas</td>
+<td><code>df[["a", "b"]]</code></td>
+</tr>
+<tr>
+<td>filtrar linhas</td>
+<td><code>df[df["col"] &gt; 10]</code></td>
+</tr>
+<tr>
+<td>filtrar com várias condições</td>
+<td><code>df[(cond1) &amp; (cond2)]</code></td>
+</tr>
+<tr>
+<td>filtro legível</td>
+<td><code>df.query("col &gt; 10")</code></td>
+</tr>
+<tr>
+<td>criar coluna</td>
+<td><code>df["nova"] = df["a"] * df["b"]</code></td>
+</tr>
+<tr>
+<td>aplicar função em coluna</td>
+<td><code>df["col"].apply(funcao)</code></td>
+</tr>
+<tr>
+<td>aplicar usando várias colunas</td>
+<td><code>df.apply(funcao, axis=1)</code></td>
+</tr>
+<tr>
+<td>trocar nulos</td>
+<td><code>df["col"].fillna(valor)</code></td>
+</tr>
+<tr>
+<td>remover nulos</td>
+<td><code>df.dropna(subset=["col"])</code></td>
+</tr>
+<tr>
+<td>converter tipo</td>
+<td><code>df["col"].astype(float)</code></td>
+</tr>
+<tr>
+<td>string para data</td>
+<td><code>pd.to_datetime(df["col"])</code></td>
+</tr>
+<tr>
+<td>juntar tabelas (JOIN)</td>
+<td><code>pd.merge(a, b, on="chave", how="left")</code></td>
+</tr>
+<tr>
+<td>empilhar tabelas</td>
+<td><code>pd.concat([df1, df2])</code></td>
+</tr>
+<tr>
+<td>agrupar e somar</td>
+<td><code>df.groupby("col")["valor"].sum()</code></td>
+</tr>
+<tr>
+<td>agregações múltiplas</td>
+<td><code>df.groupby("col").agg(total=("v","sum"))</code></td>
+</tr>
+<tr>
+<td>ordenar</td>
+<td><code>df.sort_values("col", ascending=False)</code></td>
+</tr>
+<tr>
+<td>contar valores únicos</td>
+<td><code>df["col"].value_counts()</code></td>
+</tr>
+<tr>
+<td>remover duplicatas</td>
+<td><code>df.drop_duplicates(subset=["col"])</code></td>
+</tr>
+<tr>
+<td>exportar CSV/Excel</td>
+<td><code>df.to_csv(caminho, index=False)</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="modulo-13"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-13</span><span class="mod-title">openpyxl e automação de Excel</span></h2>
+<p>Use <strong>openpyxl</strong> quando precisa de formatação, fórmulas, cores, planilhas com múltiplas abas de forma manual. Para só ler/transformar dados tabulares, <strong>prefira Pandas</strong> (<code>pd.read_excel</code>/<code>to_excel</code>) — é mais simples. openpyxl entra quando você precisa controlar a aparência ou editar um arquivo existente preservando formatação.</p>
+<h3>Abrir e criar workbook</h3>
+<pre><code class="language-python">from openpyxl import Workbook, load_workbook
+
+wb = Workbook()                             # cria novo, do zero
+wb = load_workbook(&quot;relatorio.xlsx&quot;)          # abre existente
+wb = load_workbook(&quot;relatorio.xlsx&quot;, data_only=True)   # lê VALORES calculados de fórmulas, não a fórmula em si
+</code></pre>
+<h3>Worksheets (abas)</h3>
+<pre><code class="language-python">ws = wb.active                     # aba ativa
+ws = wb[&quot;Janeiro&quot;]                  # aba pelo nome
+wb.sheetnames                        # lista de nomes de abas
+
+nova_aba = wb.create_sheet(&quot;Fevereiro&quot;)
+nova_aba = wb.create_sheet(&quot;Resumo&quot;, 0)     # cria na posição 0 (primeira)
+wb.remove(wb[&quot;AbaAntiga&quot;])
+ws.title = &quot;NovoNome&quot;
+</code></pre>
+<h3>Leitura e escrita de células</h3>
+<pre><code class="language-python">ws[&quot;A1&quot;] = &quot;Produto&quot;                  # escreve por endereço
+ws.cell(row=1, column=1, value=&quot;Produto&quot;)   # escreve por linha/coluna (útil em loop)
+
+valor = ws[&quot;A1&quot;].value
+valor = ws.cell(row=1, column=1).value
+
+for linha in ws.iter_rows(min_row=2, values_only=True):    # percorre linhas, pula cabeçalho
+    produto, preco, quantidade = linha
+
+for linha in ws.iter_rows(min_row=1, max_row=1, values_only=True):
+    cabecalho = linha
+</code></pre>
+<h3>Escrevendo uma tabela inteira (padrão comum)</h3>
+<pre><code class="language-python">cabecalho = [&quot;Produto&quot;, &quot;Preço&quot;, &quot;Quantidade&quot;]
+ws.append(cabecalho)
+
+for produto in produtos:
+    ws.append([produto[&quot;nome&quot;], produto[&quot;preco&quot;], produto[&quot;quantidade&quot;]])
+</code></pre>
+<h3>Fórmulas</h3>
+<pre><code class="language-python">ws[&quot;D2&quot;] = &quot;=B2*C2&quot;                  # fórmula como string, calculada pelo Excel ao abrir
+ws[&quot;D10&quot;] = &quot;=SUM(D2:D9)&quot;
+</code></pre>
+<h3>Estilos — fonte, preenchimento, bordas</h3>
+<pre><code class="language-python">from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+
+ws[&quot;A1&quot;].font = Font(bold=True, size=12, color=&quot;FFFFFF&quot;)
+ws[&quot;A1&quot;].fill = PatternFill(start_color=&quot;4472C4&quot;, end_color=&quot;4472C4&quot;, fill_type=&quot;solid&quot;)
+ws[&quot;A1&quot;].alignment = Alignment(horizontal=&quot;center&quot;, vertical=&quot;center&quot;)
+
+borda = Border(
+    left=Side(style=&quot;thin&quot;), right=Side(style=&quot;thin&quot;),
+    top=Side(style=&quot;thin&quot;), bottom=Side(style=&quot;thin&quot;),
+)
+ws[&quot;A1&quot;].border = borda
+</code></pre>
+<h3>Dimensões de coluna/linha</h3>
+<pre><code class="language-python">ws.column_dimensions[&quot;A&quot;].width = 20
+ws.row_dimensions[1].height = 25
+</code></pre>
+<h3>Congelar painéis, filtros</h3>
+<pre><code class="language-python">ws.freeze_panes = &quot;A2&quot;                    # congela o cabeçalho (linha 1)
+ws.auto_filter.ref = &quot;A1:C1&quot;                # ativa filtro na faixa
+</code></pre>
+<h3>Copiar dados entre abas/arquivos</h3>
+<pre><code class="language-python">aba_origem = wb[&quot;Bruto&quot;]
+aba_destino = wb[&quot;Tratado&quot;]
+
+for linha in aba_origem.iter_rows(values_only=True):
+    aba_destino.append(linha)
+</code></pre>
+<h3>Salvar</h3>
+<pre><code class="language-python">wb.save(&quot;relatorio_final.xlsx&quot;)
+</code></pre>
+<p><strong>Erro comum:</strong> esquecer <code>values_only=True</code> no <code>iter_rows()</code> — sem isso, você recebe objetos <code>Cell</code>, não os valores diretamente (precisaria fazer <code>.value</code> em cada um).</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 13</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>abrir arquivo existente</td>
+<td><code>load_workbook(caminho)</code></td>
+</tr>
+<tr>
+<td>criar novo</td>
+<td><code>Workbook()</code></td>
+</tr>
+<tr>
+<td>pegar aba</td>
+<td><code>wb["NomeAba"]</code> ou <code>wb.active</code></td>
+</tr>
+<tr>
+<td>criar aba</td>
+<td><code>wb.create_sheet("Nome")</code></td>
+</tr>
+<tr>
+<td>escrever célula</td>
+<td><code>ws["A1"] = valor</code></td>
+</tr>
+<tr>
+<td>ler célula</td>
+<td><code>ws["A1"].value</code></td>
+</tr>
+<tr>
+<td>percorrer linhas</td>
+<td><code>ws.iter_rows(min_row=2, values_only=True)</code></td>
+</tr>
+<tr>
+<td>adicionar linha no fim</td>
+<td><code>ws.append([col1, col2, col3])</code></td>
+</tr>
+<tr>
+<td>negrito</td>
+<td><code>Font(bold=True)</code></td>
+</tr>
+<tr>
+<td>cor de fundo</td>
+<td><code>PatternFill(start_color="RRGGBB", fill_type="solid")</code></td>
+</tr>
+<tr>
+<td>largura de coluna</td>
+<td><code>ws.column_dimensions["A"].width = 20</code></td>
+</tr>
+<tr>
+<td>congelar cabeçalho</td>
+<td><code>ws.freeze_panes = "A2"</code></td>
+</tr>
+<tr>
+<td>salvar</td>
+<td><code>wb.save(caminho)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-14"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-14</span><span class="mod-title">Requests e APIs</span></h2>
+<pre><code class="language-python">import requests
+</code></pre>
+<h3>Requisição básica</h3>
+<pre><code class="language-python">response = requests.get(&quot;https://api.exemplo.com/clientes&quot;)
+response.status_code                 # 200, 404, 500...
+response.json()                       # corpo da resposta como dict/list
+response.text                          # corpo como string bruta
+response.headers                        # cabeçalhos da resposta
+</code></pre>
+<h3>GET com parâmetros e headers</h3>
+<pre><code class="language-python">params = {&quot;pagina&quot;: 1, &quot;limite&quot;: 50}
+headers = {&quot;Authorization&quot;: f&quot;Bearer {token}&quot;, &quot;Accept&quot;: &quot;application/json&quot;}
+
+response = requests.get(&quot;https://api.exemplo.com/clientes&quot;, params=params, headers=headers, timeout=10)
+</code></pre>
+<p><code>timeout</code> é <strong>obrigatório em código sério</strong> — sem ele, uma API travada trava seu script para sempre.</p>
+<h3>POST, PUT, PATCH, DELETE</h3>
+<pre><code class="language-python">novo_cliente = {&quot;nome&quot;: &quot;Ana&quot;, &quot;email&quot;: &quot;ana@exemplo.com&quot;}
+response = requests.post(&quot;https://api.exemplo.com/clientes&quot;, json=novo_cliente, headers=headers)
+
+response = requests.put(&quot;https://api.exemplo.com/clientes/1&quot;, json=dados_atualizados, headers=headers)
+response = requests.patch(&quot;https://api.exemplo.com/clientes/1&quot;, json={&quot;nome&quot;: &quot;Novo Nome&quot;}, headers=headers)
+response = requests.delete(&quot;https://api.exemplo.com/clientes/1&quot;, headers=headers)
+</code></pre>
+<p><code>json=dados</code> já serializa para JSON e ajusta o header <code>Content-Type</code> — não precisa usar <code>json.dumps()</code> manualmente.</p>
+<h3>Verificar sucesso e tratar erro</h3>
+<pre><code class="language-python">response = requests.get(url, timeout=10)
+response.raise_for_status()          # lança requests.exceptions.HTTPError se status for 4xx/5xx
+dados = response.json()
+</code></pre>
+<pre><code class="language-python">try:
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    dados = response.json()
+except requests.exceptions.Timeout:
+    print(&quot;API demorou demais para responder&quot;)
+except requests.exceptions.HTTPError as e:
+    print(f&quot;Erro HTTP: {e}&quot;)
+except requests.exceptions.RequestException as e:
+    print(f&quot;Erro de conexão: {e}&quot;)
+</code></pre>
+<h3>Status codes que você mais vai ver</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>sucesso</td>
+</tr>
+<tr>
+<td>201</td>
+<td>criado com sucesso</td>
+</tr>
+<tr>
+<td>400</td>
+<td>requisição inválida (dado errado enviado)</td>
+</tr>
+<tr>
+<td>401</td>
+<td>não autenticado (token ausente/inválido)</td>
+</tr>
+<tr>
+<td>403</td>
+<td>autenticado mas sem permissão</td>
+</tr>
+<tr>
+<td>404</td>
+<td>recurso não encontrado</td>
+</tr>
+<tr>
+<td>429</td>
+<td>limite de requisições excedido (rate limit)</td>
+</tr>
+<tr>
+<td>500</td>
+<td>erro interno do servidor</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Autenticação comum</h3>
+<pre><code class="language-python"># Bearer token
+headers = {&quot;Authorization&quot;: f&quot;Bearer {token}&quot;}
+
+# Basic auth
+response = requests.get(url, auth=(usuario, senha))
+
+# API key em header customizado
+headers = {&quot;X-API-Key&quot;: chave}
+</code></pre>
+<h3>Paginação (padrão comum de API)</h3>
+<pre><code class="language-python">def coletar_todas_paginas(url_base, headers):
+    resultados = []
+    pagina = 1
+    while True:
+        response = requests.get(url_base, params={&quot;pagina&quot;: pagina}, headers=headers, timeout=10)
+        response.raise_for_status()
+        dados = response.json()
+        if not dados[&quot;itens&quot;]:
+            break
+        resultados.extend(dados[&quot;itens&quot;])
+        pagina += 1
+    return resultados
+</code></pre>
+<h3>Retry básico</h3>
+<pre><code class="language-python">import time
+
+def get_com_retry(url, tentativas=3, **kwargs):
+    for tentativa in range(1, tentativas + 1):
+        try:
+            response = requests.get(url, timeout=10, **kwargs)
+            response.raise_for_status()
+            return response
+        except requests.exceptions.RequestException as e:
+            if tentativa == tentativas:
+                raise
+            time.sleep(2 ** tentativa)     # backoff exponencial: 2s, 4s, 8s...
+</code></pre>
+<h3>Como ler uma documentação de API sem depender de IA</h3>
+<ol>
+<li>Ache a seção <strong>"Authentication"</strong> — descobre como enviar credenciais (header, query param, OAuth).</li>
+<li>Ache <strong>"Base URL"</strong> — o prefixo comum de todos os endpoints.</li>
+<li>Para cada endpoint que você precisa, veja: método HTTP (GET/POST/...), parâmetros obrigatórios vs opcionais, formato de resposta (geralmente tem um exemplo de JSON).</li>
+<li>Veja a seção de <strong>rate limits</strong> — quantas requisições por minuto são permitidas.</li>
+<li>Teste primeiro num cliente HTTP simples (<code>curl</code>, Postman, Insomnia, ou até o próprio <code>requests</code> num script isolado) antes de integrar na automação.</li>
+</ol>
+<p><strong>CONSULTA RÁPIDA — Módulo 14</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET simples</td>
+<td><code>requests.get(url, timeout=10)</code></td>
+</tr>
+<tr>
+<td>GET com parâmetros</td>
+<td><code>requests.get(url, params=dict, timeout=10)</code></td>
+</tr>
+<tr>
+<td>POST com JSON</td>
+<td><code>requests.post(url, json=dados, timeout=10)</code></td>
+</tr>
+<tr>
+<td>enviar token</td>
+<td><code>headers={"Authorization": f"Bearer {token}"}</code></td>
+</tr>
+<tr>
+<td>pegar corpo como dict</td>
+<td><code>response.json()</code></td>
+</tr>
+<tr>
+<td>checar erro HTTP</td>
+<td><code>response.raise_for_status()</code></td>
+</tr>
+<tr>
+<td>status code</td>
+<td><code>response.status_code</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-15"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-15</span><span class="mod-title">Web scraping</span></h2>
+<p><strong>Antes de tudo:</strong> verifique o <code>robots.txt</code> do site e os termos de uso. Prefira sempre uma API oficial, se existir, a fazer scraping de HTML.</p>
+<h3>Nível 1 — requests + BeautifulSoup (páginas estáticas, sem JavaScript)</h3>
+<pre><code class="language-python">import requests
+from bs4 import BeautifulSoup
+
+response = requests.get(url, timeout=10, headers={&quot;User-Agent&quot;: &quot;Mozilla/5.0&quot;})
+response.raise_for_status()
+soup = BeautifulSoup(response.text, &quot;html.parser&quot;)
+</code></pre>
+<h3>Seletores e extração</h3>
+<pre><code class="language-python">soup.find(&quot;h1&quot;)                          # primeiro elemento &lt;h1&gt;
+soup.find(&quot;div&quot;, class_=&quot;produto&quot;)          # por classe CSS
+soup.find(&quot;div&quot;, id=&quot;conteudo&quot;)              # por id
+soup.find_all(&quot;a&quot;)                            # todos os links
+soup.select(&quot;div.produto &gt; span.preco&quot;)        # seletor CSS completo
+
+titulo = soup.find(&quot;h1&quot;).get_text(strip=True)     # texto limpo (sem espaços nas pontas)
+link = soup.find(&quot;a&quot;)[&quot;href&quot;]                        # atributo do elemento
+</code></pre>
+<h3>Padrão típico: extrair uma lista de itens</h3>
+<pre><code class="language-python">produtos = []
+for card in soup.select(&quot;div.produto-card&quot;):
+    nome = card.select_one(&quot;.nome&quot;)
+    preco = card.select_one(&quot;.preco&quot;)
+    produtos.append({
+        &quot;nome&quot;: nome.get_text(strip=True) if nome else None,
+        &quot;preco&quot;: preco.get_text(strip=True) if preco else None,
+    })
+</code></pre>
+<p><strong>Sempre trate o caso do elemento não existir</strong> (<code>if nome else None</code>) — páginas reais têm inconsistências.</p>
+<h3>Paginação em scraping</h3>
+<pre><code class="language-python">todos_produtos = []
+pagina = 1
+while True:
+    response = requests.get(f&quot;{url_base}?pagina={pagina}&quot;, timeout=10)
+    soup = BeautifulSoup(response.text, &quot;html.parser&quot;)
+    itens = soup.select(&quot;.produto-card&quot;)
+    if not itens:
+        break
+    todos_produtos.extend(extrair_dados(itens))
+    pagina += 1
+</code></pre>
+<h3>Nível 2 — Playwright (quando o conteúdo depende de JavaScript)</h3>
+<p>Use quando: a página carrega dados via JavaScript depois do carregamento inicial, tem infinite scroll, ou exige interação (clicar, preencher formulário) para revelar o conteúdo. <strong>Não use</strong> para páginas simples — é mais lento e pesado que requests.</p>
+<pre><code class="language-python">from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True)
+    page = browser.new_page()
+    page.goto(url, timeout=30000)
+
+    page.wait_for_selector(&quot;.produto-card&quot;)          # espera o elemento aparecer
+
+    page.click(&quot;button.carregar-mais&quot;)                  # interação
+    page.fill(&quot;#campo-busca&quot;, &quot;notebook&quot;)
+    page.press(&quot;#campo-busca&quot;, &quot;Enter&quot;)
+
+    html = page.content()                                  # HTML final renderizado
+    browser.close()
+
+# depois disso, pode processar com BeautifulSoup normalmente
+soup = BeautifulSoup(html, &quot;html.parser&quot;)
+</code></pre>
+<h3>Downloads via Playwright</h3>
+<pre><code class="language-python">with page.expect_download() as download_info:
+    page.click(&quot;a.baixar-relatorio&quot;)
+download = download_info.value
+download.save_as(&quot;relatorio.pdf&quot;)
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 15</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baixar HTML</td>
+<td><code>requests.get(url).text</code></td>
+</tr>
+<tr>
+<td>parsear HTML</td>
+<td><code>BeautifulSoup(html, "html.parser")</code></td>
+</tr>
+<tr>
+<td>achar um elemento</td>
+<td><code>soup.find("div", class_="x")</code></td>
+</tr>
+<tr>
+<td>achar vários</td>
+<td><code>soup.find_all("div", class_="x")</code></td>
+</tr>
+<tr>
+<td>seletor CSS</td>
+<td><code>soup.select("div.x &gt; span.y")</code></td>
+</tr>
+<tr>
+<td>pegar texto limpo</td>
+<td><code>elemento.get_text(strip=True)</code></td>
+</tr>
+<tr>
+<td>pegar atributo</td>
+<td><code>elemento["href"]</code></td>
+</tr>
+<tr>
+<td>abrir navegador (Playwright)</td>
+<td><code>p.chromium.launch(headless=True)</code></td>
+</tr>
+<tr>
+<td>esperar elemento aparecer</td>
+<td><code>page.wait_for_selector(seletor)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-16"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-16</span><span class="mod-title">Banco de dados</span></h2>
+<h3>SQL básico — o que você precisa lembrar</h3>
+<pre><code class="language-sql">SELECT nome, preco FROM produtos WHERE preco &gt; 10 ORDER BY preco DESC;
+
+SELECT categoria, SUM(preco) AS total
+FROM produtos
+GROUP BY categoria
+HAVING SUM(preco) &gt; 100;
+
+SELECT p.nome, c.nome AS categoria
+FROM produtos p
+JOIN categorias c ON p.categoria_id = c.id;
+
+INSERT INTO produtos (nome, preco) VALUES ('Caneta', 1.5);
+UPDATE produtos SET preco = 2.0 WHERE nome = 'Caneta';
+DELETE FROM produtos WHERE preco &lt; 0;
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Cláusula</th>
+<th>Faz o quê</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WHERE</code></td>
+<td>filtra linhas antes de agrupar</td>
+</tr>
+<tr>
+<td><code>HAVING</code></td>
+<td>filtra depois de <code>GROUP BY</code> (sobre valores agregados)</td>
+</tr>
+<tr>
+<td><code>ORDER BY</code></td>
+<td>ordena resultado</td>
+</tr>
+<tr>
+<td><code>JOIN</code></td>
+<td>combina tabelas por uma chave</td>
+</tr>
+<tr>
+<td><code>GROUP BY</code></td>
+<td>agrupa linhas para agregação</td>
+</tr>
+</tbody>
+</table></div>
+<h3>SQLite com Python (banco em arquivo, sem servidor)</h3>
+<pre><code class="language-python">import sqlite3
+
+conexao = sqlite3.connect(&quot;dados.db&quot;)
+cursor = conexao.cursor()
+
+cursor.execute(&quot;&quot;&quot;
+    CREATE TABLE IF NOT EXISTS produtos (
+        id INTEGER PRIMARY KEY,
+        nome TEXT,
+        preco REAL
+    )
+&quot;&quot;&quot;)
+
+# SEMPRE use parâmetros (?) — nunca f-string no SQL
+cursor.execute(&quot;INSERT INTO produtos (nome, preco) VALUES (?, ?)&quot;, (&quot;Caneta&quot;, 1.5))
+conexao.commit()
+
+cursor.execute(&quot;SELECT * FROM produtos WHERE preco &gt; ?&quot;, (1.0,))
+resultados = cursor.fetchall()          # lista de tuplas
+uma_linha = cursor.fetchone()            # só a próxima linha
+
+conexao.close()
+</code></pre>
+<p><strong>Nunca faça isto (SQL injection):</strong></p>
+<pre><code class="language-python"># PERIGOSO — nunca concatene valor de usuário direto no SQL
+cursor.execute(f&quot;SELECT * FROM produtos WHERE nome = '{nome_usuario}'&quot;)
+
+# CORRETO — sempre parâmetros
+cursor.execute(&quot;SELECT * FROM produtos WHERE nome = ?&quot;, (nome_usuario,))
+</code></pre>
+<h3>Inserir vários registros de uma vez</h3>
+<pre><code class="language-python">produtos = [(&quot;Caneta&quot;, 1.5), (&quot;Caderno&quot;, 15.0), (&quot;Lápis&quot;, 1.0)]
+cursor.executemany(&quot;INSERT INTO produtos (nome, preco) VALUES (?, ?)&quot;, produtos)
+conexao.commit()
+</code></pre>
+<h3>Usando <code>with</code> para fechar a conexão automaticamente</h3>
+<pre><code class="language-python">with sqlite3.connect(&quot;dados.db&quot;) as conexao:
+    cursor = conexao.cursor()
+    cursor.execute(&quot;SELECT * FROM produtos&quot;)
+    resultados = cursor.fetchall()
+# conexao fecha sozinha ao sair do bloco
+</code></pre>
+<h3>Ler direto para Pandas (o caminho mais comum em análise de dados)</h3>
+<pre><code class="language-python">import pandas as pd
+
+conexao = sqlite3.connect(&quot;dados.db&quot;)
+df = pd.read_sql(&quot;SELECT * FROM produtos WHERE preco &gt; 10&quot;, conexao)
+
+df.to_sql(&quot;produtos_processados&quot;, conexao, if_exists=&quot;replace&quot;, index=False)
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 16</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>conectar (SQLite)</td>
+<td><code>sqlite3.connect("arquivo.db")</code></td>
+</tr>
+<tr>
+<td>criar tabela</td>
+<td><code>cursor.execute("CREATE TABLE IF NOT EXISTS ...")</code></td>
+</tr>
+<tr>
+<td>inserir com segurança</td>
+<td><code>cursor.execute("INSERT ... VALUES (?, ?)", (a, b))</code></td>
+</tr>
+<tr>
+<td>inserir vários</td>
+<td><code>cursor.executemany(sql, lista_de_tuplas)</code></td>
+</tr>
+<tr>
+<td>confirmar mudanças</td>
+<td><code>conexao.commit()</code></td>
+</tr>
+<tr>
+<td>buscar tudo</td>
+<td><code>cursor.fetchall()</code></td>
+</tr>
+<tr>
+<td>buscar um</td>
+<td><code>cursor.fetchone()</code></td>
+</tr>
+<tr>
+<td>ler direto para DataFrame</td>
+<td><code>pd.read_sql(sql, conexao)</code></td>
+</tr>
+<tr>
+<td>salvar DataFrame como tabela</td>
+<td><code>df.to_sql(nome, conexao, if_exists="replace")</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="modulo-17"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-17</span><span class="mod-title">Automação de processos</span></h2>
+<p>Todo processo de automação segue o mesmo esqueleto:</p>
+<pre><code>ENTRADA → VALIDAÇÃO → PROCESSAMENTO → SAÍDA → LOG
+</code></pre>
+<h3>Padrão: automação de arquivos</h3>
+<pre><code class="language-python">from pathlib import Path
+import logging
+
+def automatizar_pasta(pasta_entrada: Path, pasta_saida: Path):
+    pasta_saida.mkdir(exist_ok=True)
+    for arquivo in pasta_entrada.glob(&quot;*.csv&quot;):
+        try:
+            dados = processar_arquivo(arquivo)
+            salvar_resultado(dados, pasta_saida / arquivo.name)
+            logging.info(f&quot;Processado: {arquivo.name}&quot;)
+        except Exception as e:
+            logging.error(f&quot;Falha em {arquivo.name}: {e}&quot;)
+</code></pre>
+<h3>Padrão: automação de planilhas (consolidar várias em uma)</h3>
+<pre><code class="language-python">import pandas as pd
+from pathlib import Path
+
+def consolidar_planilhas(pasta: Path) -&gt; pd.DataFrame:
+    dataframes = []
+    for arquivo in pasta.glob(&quot;*.xlsx&quot;):
+        df = pd.read_excel(arquivo)
+        df[&quot;arquivo_origem&quot;] = arquivo.name
+        dataframes.append(df)
+    return pd.concat(dataframes, ignore_index=True)
+</code></pre>
+<h3>Padrão: automação de APIs (coletar e salvar)</h3>
+<pre><code class="language-python">def coletar_e_salvar(url, headers, caminho_saida):
+    dados = coletar_todas_paginas(url, headers)     # do Módulo 14
+    df = pd.DataFrame(dados)
+    df.to_csv(caminho_saida, index=False)
+    return len(df)
+</code></pre>
+<h3>Padrão: automação de relatórios</h3>
+<pre><code class="language-python">def gerar_relatorio(df: pd.DataFrame, caminho_saida: Path):
+    resumo = df.groupby(&quot;categoria&quot;).agg(
+        total=(&quot;valor&quot;, &quot;sum&quot;),
+        quantidade=(&quot;valor&quot;, &quot;count&quot;),
+    ).reset_index()
+    resumo.to_excel(caminho_saida, index=False, sheet_name=&quot;Resumo&quot;)
+    return resumo
+</code></pre>
+<h3>Padrão: processamento em lote / ETL simples</h3>
+<pre><code class="language-python">def etl_diario(pasta_entrada: Path, pasta_saida: Path):
+    # Extract
+    arquivos = list(pasta_entrada.glob(&quot;*.csv&quot;))
+    dados_brutos = [pd.read_csv(a) for a in arquivos]
+    df = pd.concat(dados_brutos, ignore_index=True)
+
+    # Transform
+    df = df.dropna(subset=[&quot;valor&quot;])
+    df[&quot;valor&quot;] = df[&quot;valor&quot;].astype(float)
+    df[&quot;data&quot;] = pd.to_datetime(df[&quot;data&quot;])
+    resumo = df.groupby(df[&quot;data&quot;].dt.date)[&quot;valor&quot;].sum().reset_index()
+
+    # Load
+    resumo.to_csv(pasta_saida / &quot;resumo_diario.csv&quot;, index=False)
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 17</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Categoria</th>
+<th>Esqueleto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>arquivos</td>
+<td><code>glob()</code> → processar → salvar → logar</td>
+</tr>
+<tr>
+<td>planilhas</td>
+<td><code>read_excel()</code> em loop → <code>concat</code> → <code>to_excel</code></td>
+</tr>
+<tr>
+<td>APIs</td>
+<td>paginação → <code>DataFrame</code> → <code>to_csv</code></td>
+</tr>
+<tr>
+<td>relatórios</td>
+<td><code>groupby/agg</code> → <code>to_excel</code></td>
+</tr>
+<tr>
+<td>ETL</td>
+<td>Extract (ler) → Transform (limpar/calcular) → Load (salvar)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-18"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-18</span><span class="mod-title">Logging</span></h2>
+<p>Não use <code>print()</code> para diagnosticar automação em produção — use <code>logging</code>. <code>print</code> não tem nível, não tem timestamp automático e não vai pra arquivo sem esforço extra.</p>
+<h3>Configuração básica</h3>
+<pre><code class="language-python">import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=&quot;%(asctime)s - %(levelname)s - %(message)s&quot;,
+    handlers=[
+        logging.FileHandler(&quot;automacao.log&quot;, encoding=&quot;utf-8&quot;),
+        logging.StreamHandler()      # também mostra no console
+    ]
+)
+
+logger = logging.getLogger(__name__)
+</code></pre>
+<h3>Níveis (do menos ao mais grave)</h3>
+<pre><code class="language-python">logger.debug(&quot;valor intermediário: %s&quot;, valor)     # detalhe técnico, só em desenvolvimento
+logger.info(&quot;Processando arquivo vendas.csv&quot;)        # progresso normal
+logger.warning(&quot;Linha 45 ignorada: preço negativo&quot;)   # algo estranho, mas não quebrou
+logger.error(&quot;Falha ao conectar na API&quot;)                # algo falhou
+logger.critical(&quot;Banco de dados inacessível, abortando&quot;)  # falha grave, programa não continua
+</code></pre>
+<p><strong>Por que usar <code>%s</code> em vez de f-string no logger:</strong> o logger só formata a string se o nível estiver ativo — mais eficiente quando <code>debug()</code> está desligado em produção. Na prática, f-string também funciona e é mais comum hoje — use o que for mais legível para o time.</p>
+<h3>Diagnosticando uma automação que falhou (uso real)</h3>
+<pre><code class="language-python">try:
+    processar_arquivo(caminho)
+except Exception as e:
+    logger.exception(f&quot;Erro ao processar {caminho}&quot;)   # loga o erro E o stack trace completo
+    # logger.exception só deve ser chamado dentro de um except
+</code></pre>
+<p><code>logger.exception()</code> grava automaticamente o traceback completo — essencial para descobrir depois <strong>onde exatamente</strong> o script quebrou, sem precisar reproduzir o erro.</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 18</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>configurar logging básico</td>
+<td><code>logging.basicConfig(level=..., format=..., handlers=[...])</code></td>
+</tr>
+<tr>
+<td>logar progresso</td>
+<td><code>logger.info("mensagem")</code></td>
+</tr>
+<tr>
+<td>logar alerta não fatal</td>
+<td><code>logger.warning("mensagem")</code></td>
+</tr>
+<tr>
+<td>logar erro</td>
+<td><code>logger.error("mensagem")</code></td>
+</tr>
+<tr>
+<td>logar erro com stack trace</td>
+<td><code>logger.exception("mensagem")</code> dentro de <code>except</code></td>
+</tr>
+<tr>
+<td>salvar log em arquivo</td>
+<td><code>logging.FileHandler("arquivo.log")</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-19"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-19</span><span class="mod-title">Estrutura de projetos</span></h2>
+<h3>De <code>script.py</code> para projeto organizado</h3>
+<pre><code>projeto/
+│
+├── main.py                # ponto de entrada, orquestra tudo
+├── config.py                # configurações (caminhos, chaves de API via env)
+├── requirements.txt
+│
+├── src/
+│   ├── arquivos.py          # funções de manipulação de arquivo
+│   ├── dados.py               # transformação/validação de dados
+│   └── relatorios.py            # geração de relatório final
+│
+├── input/                     # dados de entrada
+├── output/                      # resultado gerado
+├── logs/                          # arquivos de log
+└── tests/                           # testes automatizados
+</code></pre>
+<h3><code>config.py</code> — centralizar configuração</h3>
+<pre><code class="language-python">from pathlib import Path
+import os
+
+BASE_DIR = Path(__file__).resolve().parent
+PASTA_INPUT = BASE_DIR / &quot;input&quot;
+PASTA_OUTPUT = BASE_DIR / &quot;output&quot;
+
+API_TOKEN = os.environ.get(&quot;API_TOKEN&quot;)     # nunca deixe segredo direto no código
+</code></pre>
+<h3><code>main.py</code> — só orquestra</h3>
+<pre><code class="language-python">from src.arquivos import listar_arquivos_entrada
+from src.dados import processar_dados
+from src.relatorios import gerar_relatorio
+from config import PASTA_INPUT, PASTA_OUTPUT
+
+def main():
+    arquivos = listar_arquivos_entrada(PASTA_INPUT)
+    dados = processar_dados(arquivos)
+    gerar_relatorio(dados, PASTA_OUTPUT)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<h3>Quando essa estrutura faz sentido</h3>
+<ul>
+<li><strong>Vale a pena:</strong> script vai crescer, vai ser mantido por semanas/meses, tem múltiplas responsabilidades (ler + transformar + gerar relatório + notificar), ou vai ter testes.</li>
+<li><strong>É exagero:</strong> script de uso único, tarefa pequena e pontual (ex.: "renomear esses 20 arquivos uma vez"). Nesse caso, um <code>script.py</code> de 30-40 linhas é perfeitamente correto — não crie estrutura de pastas para isso.</li>
+</ul>
+<p><strong>CONSULTA RÁPIDA — Módulo 19</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Onde colocar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ponto de entrada do programa</td>
+<td><code>main.py</code></td>
+</tr>
+<tr>
+<td>caminhos e configurações</td>
+<td><code>config.py</code></td>
+</tr>
+<tr>
+<td>lógica reutilizável por tema</td>
+<td><code>src/nome_do_tema.py</code></td>
+</tr>
+<tr>
+<td>dados que entram</td>
+<td><code>input/</code></td>
+</tr>
+<tr>
+<td>dados que saem</td>
+<td><code>output/</code></td>
+</tr>
+<tr>
+<td>segredo/token</td>
+<td>variável de ambiente, nunca no código</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-20"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-20</span><span class="mod-title">Testes</span></h2>
+<pre><code class="language-python"># pip install pytest
+</code></pre>
+<h3>Estrutura básica</h3>
+<pre><code class="language-python"># src/dados.py
+def calcular_total(valores: list[float]) -&gt; float:
+    return sum(valores)
+
+def linha_valida(linha: dict) -&gt; bool:
+    return linha.get(&quot;preco&quot;, -1) &gt;= 0
+</code></pre>
+<pre><code class="language-python"># tests/test_dados.py
+from src.dados import calcular_total, linha_valida
+
+def test_calcular_total_soma_valores():
+    assert calcular_total([10, 20, 30]) == 60
+
+def test_calcular_total_lista_vazia():
+    assert calcular_total([]) == 0
+
+def test_linha_valida_aceita_preco_positivo():
+    assert linha_valida({&quot;preco&quot;: 10}) is True
+
+def test_linha_valida_rejeita_preco_negativo():
+    assert linha_valida({&quot;preco&quot;: -5}) is False
+</code></pre>
+<p>Rodar: <code>pytest</code> (na raiz do projeto) ou <code>pytest tests/test_dados.py -v</code> (verboso, um arquivo específico).</p>
+<h3>Fixtures (dados/preparação reutilizados entre testes)</h3>
+<pre><code class="language-python">import pytest
+
+@pytest.fixture
+def clientes_exemplo():
+    return [
+        {&quot;nome&quot;: &quot;Ana&quot;, &quot;ativo&quot;: True},
+        {&quot;nome&quot;: &quot;João&quot;, &quot;ativo&quot;: False},
+    ]
+
+def test_filtrar_ativos(clientes_exemplo):
+    ativos = [c for c in clientes_exemplo if c[&quot;ativo&quot;]]
+    assert len(ativos) == 1
+</code></pre>
+<h3>Testando transformação de dados (comum no seu caso de uso)</h3>
+<pre><code class="language-python">import pandas as pd
+from src.dados import calcular_resumo
+
+def test_calcular_resumo_agrupa_por_categoria():
+    df = pd.DataFrame({
+        &quot;categoria&quot;: [&quot;A&quot;, &quot;A&quot;, &quot;B&quot;],
+        &quot;valor&quot;: [10, 20, 30],
+    })
+    resultado = calcular_resumo(df)
+    assert resultado.loc[resultado[&quot;categoria&quot;] == &quot;A&quot;, &quot;total&quot;].iloc[0] == 30
+</code></pre>
+<h3>Testando arquivos com <code>tmp_path</code> (fixture pronta do pytest — cria pasta temporária)</h3>
+<pre><code class="language-python">def test_salvar_arquivo(tmp_path):
+    caminho = tmp_path / &quot;saida.csv&quot;
+    salvar_csv([{&quot;nome&quot;: &quot;Ana&quot;}], caminho)
+    assert caminho.exists()
+</code></pre>
+<h3>Mocks (só quando realmente necessário — ex.: evitar chamar uma API de verdade no teste)</h3>
+<pre><code class="language-python">from unittest.mock import patch
+
+def test_coletar_dados_sem_chamar_api_de_verdade():
+    with patch(&quot;src.api.requests.get&quot;) as mock_get:
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {&quot;itens&quot;: [{&quot;id&quot;: 1}]}
+        resultado = coletar_dados(&quot;http://fake-url&quot;)
+        assert resultado == [{&quot;id&quot;: 1}]
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 20</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>declarar teste</td>
+<td><code>def test_algo():</code></td>
+</tr>
+<tr>
+<td>checar resultado</td>
+<td><code>assert resultado == esperado</code></td>
+</tr>
+<tr>
+<td>rodar todos os testes</td>
+<td><code>pytest</code></td>
+</tr>
+<tr>
+<td>rodar um arquivo verboso</td>
+<td><code>pytest tests/test_x.py -v</code></td>
+</tr>
+<tr>
+<td>dado reutilizável</td>
+<td><code>@pytest.fixture</code></td>
+</tr>
+<tr>
+<td>pasta temporária para teste de arquivo</td>
+<td>parâmetro <code>tmp_path</code></td>
+</tr>
+<tr>
+<td>simular chamada externa</td>
+<td><code>unittest.mock.patch</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="modulo-21"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-21</span><span class="mod-title">Boas práticas</span></h2>
+<h3>PEP 8 essencial (o que realmente importa no dia a dia)</h3>
+<ul>
+<li>nomes de variáveis e funções: <code>snake_case</code> (<code>calcular_total</code>, não <code>calcularTotal</code>)</li>
+<li>nomes de classes: <code>PascalCase</code> (<code>ProcessadorDados</code>)</li>
+<li>constantes: <code>MAIUSCULO_COM_UNDERSCORE</code> (<code>LIMITE_MAXIMO = 100</code>)</li>
+<li>indentação: 4 espaços, nunca tab</li>
+<li>linhas: idealmente até ~88-100 caracteres</li>
+</ul>
+<h3>Nomes que comunicam intenção</h3>
+<pre><code class="language-python"># ruim
+def proc(d):
+    r = []
+    for x in d:
+        if x[2] &gt; 0:
+            r.append(x)
+    return r
+
+# bom
+def filtrar_vendas_positivas(vendas):
+    return [venda for venda in vendas if venda[&quot;valor&quot;] &gt; 0]
+</code></pre>
+<h3>Responsabilidade única</h3>
+<p>Cada função faz <strong>uma coisa</strong>. Se o nome da função tem "e" no meio ("ler_e_validar_e_salvar"), é sinal de quebrar em 3 funções.</p>
+<h3>DRY sem exagero</h3>
+<p>Repetir 2 linhas iguais em 2 lugares não é necessariamente errado. DRY (Don't Repeat Yourself) vale quando a duplicação representa a <strong>mesma regra de negócio</strong> — se você mudar a regra, teria que lembrar de mudar em vários lugares. Duplicação acidental de estrutura (dois loops parecidos, mas com propósitos diferentes) não precisa virar abstração forçada.</p>
+<h3>Docstrings e comentários</h3>
+<pre><code class="language-python">def calcular_total_com_desconto(preco: float, percentual_desconto: float) -&gt; float:
+    &quot;&quot;&quot;Aplica desconto percentual sobre o preço.
+
+    percentual_desconto deve estar entre 0 e 100.
+    &quot;&quot;&quot;
+    return preco - (preco * percentual_desconto / 100)
+</code></pre>
+<p>Comente o <strong>porquê</strong>, não o <strong>o quê</strong> (o código já diz o que faz, se estiver bem escrito):</p>
+<pre><code class="language-python"># ruim — só repete o código
+# soma 1 no contador
+contador += 1
+
+# bom — explica uma decisão não óbvia
+# arredonda para cima porque a API cobra por requisição parcial
+paginas = math.ceil(total_itens / itens_por_pagina)
+</code></pre>
+<h3>Type hints</h3>
+<pre><code class="language-python">def calcular_total(valores: list[float]) -&gt; float:
+    return sum(valores)
+
+def buscar_cliente(cliente_id: int) -&gt; dict | None:
+    ...
+</code></pre>
+<p>Não são obrigatórios, mas ajudam muito quando você volta ao código dias depois — e ferramentas como editores/linters usam isso para te avisar de erros antes de rodar.</p>
+<h3>Segurança básica</h3>
+<ul>
+<li>nunca deixe senha/token/chave de API direto no código — use variáveis de ambiente (<code>os.environ.get("API_TOKEN")</code>) ou arquivo <code>.env</code> (com <code>python-dotenv</code>), e adicione esse arquivo ao <code>.gitignore</code>.</li>
+<li>sempre use parâmetros (<code>?</code>) em SQL, nunca concatenação de string.</li>
+<li>valide dados de entrada externos (arquivo, API, formulário) antes de usar.</li>
+</ul>
+<h3>Performance — quando se preocupar</h3>
+<p>Não otimize prematuramente. Escreva código claro primeiro. Só otimize quando: o script está visivelmente lento, e você já identificou (não chutou) onde está o gargalo — normalmente é um loop que deveria ser vetorizado (Pandas) ou uma leitura de arquivo repetida desnecessariamente.</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 21</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Princípio</th>
+<th>Resumo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nomes</td>
+<td><code>snake_case</code> para função/variável, <code>PascalCase</code> para classe</td>
+</tr>
+<tr>
+<td>função</td>
+<td>uma responsabilidade só</td>
+</tr>
+<tr>
+<td>comentário</td>
+<td>explica o porquê, não o óbvio</td>
+</tr>
+<tr>
+<td>segredo</td>
+<td>nunca no código, sempre em variável de ambiente</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>sempre parametrizado</td>
+</tr>
+<tr>
+<td>otimização</td>
+<td>só depois de identificar o gargalo real</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-22"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-22</span><span class="mod-title">Depuração</span></h2>
+<h3>O processo (siga nessa ordem, não pule etapas)</h3>
+<ol>
+<li><strong>Reproduzir o erro</strong> — rode de novo, confirme que acontece sempre (ou identifique em que condição acontece).</li>
+<li><strong>Ler a mensagem completa</strong> — o Python já te diz o tipo do erro e geralmente onde. Não ignore o texto do erro.</li>
+<li><strong>Identificar a linha</strong> — o traceback mostra a pilha de chamadas; a <strong>última linha do seu código</strong> no traceback é onde o erro efetivamente ocorreu.</li>
+<li><strong>Inspecionar os valores</strong> — o que estava dentro da variável naquele momento? Muitas vezes o erro é "o dado não era o que eu esperava", não um erro de lógica.</li>
+<li><strong>Isolar o problema</strong> — reduza ao menor trecho de código que ainda reproduz o erro (comente partes, teste isoladamente no console).</li>
+<li><strong>Criar hipótese</strong> — "acho que a coluna X está vindo como string em vez de número".</li>
+<li><strong>Testar a hipótese</strong> — <code>print(type(valor))</code>, ou inspecione no debugger.</li>
+<li><strong>Corrigir</strong>.</li>
+<li><strong>Testar de novo</strong> — inclusive casos que já funcionavam, para não quebrar algo que estava certo.</li>
+</ol>
+<h3>Lendo um traceback</h3>
+<pre><code>Traceback (most recent call last):
+  File &quot;main.py&quot;, line 12, in &lt;module&gt;
+    resultado = processar(dados)
+  File &quot;src/dados.py&quot;, line 8, in processar
+    total = valores[&quot;preco&quot;] * quantidade
+KeyError: 'preco'
+</code></pre>
+<p>Leia de <strong>baixo para cima</strong>: a última linha (<code>KeyError: 'preco'</code>) é o tipo do erro. A linha logo acima mostra o arquivo e a linha exata de código onde ele aconteceu (<code>src/dados.py</code>, linha 8). As linhas de cima mostram a cadeia de chamadas que levou até lá.</p>
+<h3>print() estratégico</h3>
+<pre><code class="language-python">print(f&quot;DEBUG - tipo: {type(valor)}, valor: {valor!r}&quot;)   # !r mostra repr, útil pra ver aspas/espaços escondidos
+</code></pre>
+<p>Print estratégico funciona bem para scripts pequenos. Para algo mais complexo, use o debugger.</p>
+<h3>Debugger (breakpoint nativo)</h3>
+<pre><code class="language-python">def processar_linha(linha):
+    breakpoint()      # pausa a execução aqui, abre um prompt interativo (pdb)
+    total = linha[&quot;preco&quot;] * linha[&quot;quantidade&quot;]
+    return total
+</code></pre>
+<p>No prompt do <code>breakpoint()</code>: <code>n</code> (próxima linha), <code>s</code> (entra na função chamada), <code>c</code> (continua até o fim/próximo breakpoint), <code>p variavel</code> (imprime o valor), <code>q</code> (sai).</p>
+<p>No VS Code/PyCharm, prefira o debugger visual (clique na margem para criar um breakpoint) — é mais rápido que <code>breakpoint()</code> manual para depuração recorrente.</p>
+<h3>Inspeção de variáveis em Pandas</h3>
+<pre><code class="language-python">print(df.dtypes)          # tipo de cada coluna — fonte comum de bug
+print(df.isna().sum())      # onde tem nulo escondido
+print(df.shape)               # linhas/colunas mudaram do esperado?
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 22</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Sintoma</th>
+<th>Primeiro passo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KeyError</code></td>
+<td>a chave existe mesmo? <code>print(dict.keys())</code></td>
+</tr>
+<tr>
+<td><code>TypeError</code> numa operação</td>
+<td><code>print(type(valor))</code> nos dois lados da operação</td>
+</tr>
+<tr>
+<td>resultado vazio inesperado</td>
+<td>o filtro está certo? teste a condição isolada</td>
+</tr>
+<tr>
+<td>valor <code>NaN</code>/<code>None</code> aparecendo</td>
+<td><code>df.isna().sum()</code> ou <code>print(valor is None)</code></td>
+</tr>
+<tr>
+<td>API retornando erro</td>
+<td><code>print(response.status_code, response.text)</code> antes de <code>.json()</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-23"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-23</span><span class="mod-title">Como não depender de IA</span></h2>
+<p>O objetivo aqui não é "nunca use IA" — é usar IA como <strong>última etapa</strong>, não como primeira, para não deixar sua fluência atrofiar de novo.</p>
+<h3>Ordem recomendada quando travar</h3>
+<ol>
+<li><strong>Tente sozinho primeiro</strong> — mesmo que erre, o esforço de tentar é o que reconstrói a memória muscular de sintaxe.</li>
+<li><strong>Consulte este manual</strong> (ou a documentação oficial) — a maior parte do que trava você já está mapeado aqui.</li>
+<li><strong>Pesquise exemplos</strong> — Stack Overflow, documentação oficial da biblioteca, changelog.</li>
+<li><strong>Depure sistematicamente</strong> (Módulo 22) — muitas vezes o erro se resolve sem precisar de mais informação nenhuma, só de olhar com calma.</li>
+<li><strong>Só então pergunte à IA</strong> — e quando perguntar, peça <strong>explicação antes de código pronto</strong>.</li>
+</ol>
+<h3>Como perguntar bem para uma IA (ou para qualquer colega)</h3>
+<p><strong>Ruim</strong> — terceiriza o problema inteiro:</p>
+<blockquote>
+<p>"Faça uma automação que leia essa planilha."</p>
+</blockquote>
+<p><strong>Bom</strong> — mostra que você já pensou, já tentou, e pede exatamente o que falta:</p>
+<blockquote>
+<p>"Estou tentando filtrar um DataFrame pela coluna 'status', mas meu filtro retorna vazio. Aqui está meu código e o resultado. Explique o possível problema sem reescrever o código."</p>
+</blockquote>
+<h3>Regra de ouro</h3>
+<p><strong>Nunca copie um trecho de código que você não consegue explicar linha por linha.</strong> Se a IA te dá uma solução e você não entende uma parte, pergunte "o que essa linha faz e por quê" antes de usar. Isso é o que separa "recuperar fluência" de "delegar de novo".</p>
+<h3>Checklist antes de perguntar para IA</h3>
+<ul>
+<li>[ ] Tentei escrever a solução eu mesmo, mesmo que incompleta?</li>
+<li>[ ] Sei descrever exatamente o que está errado (não só "não funciona")?</li>
+<li>[ ] Tenho o erro/traceback completo, não só um resumo?</li>
+<li>[ ] Sei o que eu <strong>esperava</strong> que acontecesse vs o que <strong>aconteceu</strong>?</li>
+<li>[ ] Estou pedindo explicação, e não só código pronto?</li>
+</ul>
+<p><strong>CONSULTA RÁPIDA — Módulo 23</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Em vez de pedir</th>
+<th>Peça</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"faça X pra mim"</td>
+<td>"por que meu código X não funciona, sem reescrever"</td>
+</tr>
+<tr>
+<td>código pronto direto</td>
+<td>explicação do conceito, depois você escreve</td>
+</tr>
+<tr>
+<td>solução genérica</td>
+<td>ajuda com o erro específico que você tem, com seu código real</td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="modulo-24"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-24</span><span class="mod-title">Orquestração com Prefect</span></h2>
+<p>Prefect serve para transformar scripts soltos em <strong>fluxos observáveis, agendáveis e com retry automático</strong>. Testado com <strong>Prefect 2.x</strong> (a versão 3.x manteve os conceitos de <code>@task</code>/<code>@flow</code>, mas alguns detalhes de deploy mudaram — confira a documentação oficial se for colocar em produção).</p>
+<h3>Por que usar Prefect em vez de só rodar o script</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Sem Prefect</th>
+<th>Com Prefect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>erro derruba o script inteiro</td>
+<td>retry automático por task</td>
+</tr>
+<tr>
+<td>sem visibilidade do que rodou</td>
+<td>UI com histórico de execuções</td>
+</tr>
+<tr>
+<td>agendamento via cron manual</td>
+<td>schedules integrados</td>
+</tr>
+<tr>
+<td>logs espalhados</td>
+<td>logging centralizado por execução</td>
+</tr>
+<tr>
+<td>difícil saber onde travou</td>
+<td>cada task tem status próprio (rodando, falhou, retry)</td>
+</tr>
+</tbody>
+</table></div>
+<h3><code>@task</code> e <code>@flow</code> — o básico</h3>
+<pre><code class="language-python">from prefect import flow, task
+
+@task
+def extrair_dados(caminho):
+    return pd.read_csv(caminho)
+
+@task
+def validar_dados(df):
+    return df.dropna(subset=[&quot;valor&quot;])
+
+@task
+def salvar_resultado(df, caminho_saida):
+    df.to_csv(caminho_saida, index=False)
+
+@flow
+def pipeline_vendas(caminho_entrada: str, caminho_saida: str):
+    df = extrair_dados(caminho_entrada)
+    df_validado = validar_dados(df)
+    salvar_resultado(df_validado, caminho_saida)
+
+if __name__ == &quot;__main__&quot;:
+    pipeline_vendas(&quot;vendas.csv&quot;, &quot;vendas_tratadas.csv&quot;)
+</code></pre>
+<p>Isso já é praticamente idêntico ao padrão ENTRADA → VALIDAÇÃO → PROCESSAMENTO → SAÍDA do Módulo 2 — Prefect só adiciona observabilidade em cima de funções que você já escreveria de qualquer forma.</p>
+<h3>Retry automático</h3>
+<pre><code class="language-python">@task(retries=3, retry_delay_seconds=10)
+def consultar_api(url):
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    return response.json()
+</code></pre>
+<p>Se a task falhar (exceção não tratada), o Prefect tenta de novo automaticamente até 3 vezes, esperando 10 segundos entre tentativas — sem você escrever <code>try/except</code> com loop manual.</p>
+<h3>Logging dentro do flow</h3>
+<pre><code class="language-python">from prefect import get_run_logger
+
+@task
+def processar_arquivo(caminho):
+    logger = get_run_logger()
+    logger.info(f&quot;Processando {caminho}&quot;)
+    ...
+</code></pre>
+<p>Esse log aparece tanto no console quanto na UI do Prefect, associado à execução específica — mais útil que <code>print()</code> porque fica rastreável por execução.</p>
+<h3>Rodando tasks em paralelo com <code>.submit()</code></h3>
+<pre><code class="language-python">@flow
+def processar_varios_arquivos(arquivos: list[str]):
+    futures = [processar_arquivo.submit(arq) for arq in arquivos]
+    resultados = [f.result() for f in futures]
+    return resultados
+</code></pre>
+<p><code>.submit()</code> dispara a task de forma assíncrona (não bloqueia até terminar); <code>.result()</code> espera e pega o valor. Útil quando você tem várias tasks independentes (ex.: processar vários arquivos, consultar várias APIs) e quer rodar em paralelo em vez de sequencialmente.</p>
+<h3>Subflows (compor pipelines menores)</h3>
+<pre><code class="language-python">@flow
+def etl_vendas(caminho):
+    df = extrair_dados(caminho)
+    return validar_dados(df)
+
+@flow
+def pipeline_completo():
+    df_vendas = etl_vendas(&quot;vendas.csv&quot;)
+    df_estoque = etl_vendas(&quot;estoque.csv&quot;)   # reusa o mesmo subflow
+    ...
+</code></pre>
+<h3>Parâmetros e agendamento</h3>
+<pre><code class="language-python">@flow
+def pipeline_diario(data_referencia: str = None):
+    data = data_referencia or date.today().isoformat()
+    ...
+</code></pre>
+<p>Para rodar com agendamento recorrente (ex.: todo dia às 6h), o caminho atual do Prefect é <code>flow.serve()</code> (Prefect 2.19+) ou criar um <em>deployment</em> via CLI (<code>prefect deploy</code>), associando um <em>schedule</em> (cron). Como essa parte muda com frequência entre versões, ao configurar produção <strong>confirme a sintaxe exata na documentação oficial do Prefect</strong> para a versão instalada no seu ambiente:</p>
+<pre><code class="language-python">if __name__ == &quot;__main__&quot;:
+    pipeline_diario.serve(name=&quot;pipeline-vendas-diario&quot;, cron=&quot;0 6 * * *&quot;)
+</code></pre>
+<h3>Rodando a UI localmente</h3>
+<pre><code class="language-bash">prefect server start        # sobe a interface local em http://localhost:4200
+</code></pre>
+<p>Lá você acompanha execuções, vê logs, reexecuta flows que falharam, e visualiza o histórico — substitui boa parte do trabalho manual de checar arquivo de log.</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 24</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>transformar função em task</td>
+<td><code>@task</code> acima da função</td>
+</tr>
+<tr>
+<td>transformar função em flow</td>
+<td><code>@flow</code> acima da função</td>
+</tr>
+<tr>
+<td>retry automático</td>
+<td><code>@task(retries=3, retry_delay_seconds=10)</code></td>
+</tr>
+<tr>
+<td>log dentro do flow</td>
+<td><code>logger = get_run_logger()</code></td>
+</tr>
+<tr>
+<td>rodar em paralelo</td>
+<td><code>task.submit(...)</code> + <code>.result()</code></td>
+</tr>
+<tr>
+<td>compor flows menores</td>
+<td>chamar um <code>@flow</code> dentro de outro (subflow)</td>
+</tr>
+<tr>
+<td>subir a UI local</td>
+<td><code>prefect server start</code></td>
+</tr>
+<tr>
+<td>agendar execução recorrente</td>
+<td><code>flow.serve(name=..., cron="0 6 * * *")</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-25"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-25</span><span class="mod-title">Selenium</span></h2>
+<p>Testado com <strong>Selenium 4.x</strong>. Use Selenium quando precisa automatizar interação real com um navegador — preencher formulários, clicar em botões, navegar por páginas que dependem de sessão/login. Para só extrair dados de página estática, o Módulo 15 (<code>requests</code> + <code>BeautifulSoup</code>) é mais rápido e mais simples.</p>
+<h3>Selenium vs Playwright — quando usar cada um</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Situação</th>
+<th>Prefer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>já existe infraestrutura/testes em Selenium</td>
+<td>Selenium</td>
+</tr>
+<tr>
+<td>projeto novo, sem legado</td>
+<td>Playwright costuma ser mais rápido e com API mais moderna</td>
+</tr>
+<tr>
+<td>precisa de suporte amplo em ferramentas de CI/QA legadas</td>
+<td>Selenium</td>
+</tr>
+<tr>
+<td>espera automática por elementos "só funciona" com menos configuração</td>
+<td>Playwright</td>
+</tr>
+</tbody>
+</table></div>
+<p>Os dois resolvem o mesmo problema — o conteúdo abaixo assume que você já tem motivo para usar Selenium especificamente (ex.: projeto existente).</p>
+<h3>Configuração básica (Selenium 4 já gerencia o driver automaticamente na maioria dos casos)</h3>
+<pre><code class="language-python">from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+driver = webdriver.Chrome()          # abre o navegador
+driver.get(&quot;https://exemplo.com&quot;)
+
+driver.quit()                          # fecha o navegador — sempre feche no final
+</code></pre>
+<h3>Modo headless (sem abrir janela visível — comum em automação de servidor)</h3>
+<pre><code class="language-python">from selenium.webdriver.chrome.options import Options
+
+opcoes = Options()
+opcoes.add_argument(&quot;--headless=new&quot;)
+driver = webdriver.Chrome(options=opcoes)
+</code></pre>
+<h3>Localizando elementos</h3>
+<pre><code class="language-python">driver.find_element(By.ID, &quot;usuario&quot;)
+driver.find_element(By.NAME, &quot;senha&quot;)
+driver.find_element(By.CLASS_NAME, &quot;botao-login&quot;)
+driver.find_element(By.CSS_SELECTOR, &quot;div.produto &gt; span.preco&quot;)
+driver.find_element(By.XPATH, &quot;//button[text()='Enviar']&quot;)
+
+driver.find_elements(By.CLASS_NAME, &quot;produto-card&quot;)     # plural — retorna uma lista
+</code></pre>
+<h3>Interações</h3>
+<pre><code class="language-python">campo = driver.find_element(By.ID, &quot;usuario&quot;)
+campo.send_keys(&quot;meu_login&quot;)               # digitar
+campo.clear()                                # limpar campo
+
+botao = driver.find_element(By.ID, &quot;entrar&quot;)
+botao.click()                                 # clicar
+
+from selenium.webdriver.support.ui import Select
+select = Select(driver.find_element(By.ID, &quot;estado&quot;))
+select.select_by_visible_text(&quot;Bahia&quot;)
+</code></pre>
+<h3>Esperas — o ponto que mais causa bug em quem está enferrujado</h3>
+<p><strong>Nunca use <code>time.sleep()</code> como estratégia principal de espera</strong> — é lento e não confiável (às vezes espera de menos, às vezes de mais). Use espera explícita:</p>
+<pre><code class="language-python">from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+espera = WebDriverWait(driver, 10)          # espera até 10s
+elemento = espera.until(EC.presence_of_element_located((By.ID, &quot;resultado&quot;)))
+elemento_clicavel = espera.until(EC.element_to_be_clickable((By.ID, &quot;botao&quot;)))
+</code></pre>
+<p><strong>Erro comum:</strong> tentar interagir com um elemento antes da página terminar de carregar aquele conteúdo (comum em páginas com JavaScript) — o sintoma é <code>NoSuchElementException</code> ou <code>ElementNotInteractableException</code> intermitente. A causa quase sempre é falta de espera explícita.</p>
+<h3>Formulários — padrão completo</h3>
+<pre><code class="language-python">driver.get(&quot;https://exemplo.com/login&quot;)
+
+driver.find_element(By.ID, &quot;usuario&quot;).send_keys(&quot;meu_login&quot;)
+driver.find_element(By.ID, &quot;senha&quot;).send_keys(&quot;minha_senha&quot;)
+driver.find_element(By.ID, &quot;entrar&quot;).click()
+
+espera = WebDriverWait(driver, 10)
+espera.until(EC.presence_of_element_located((By.ID, &quot;painel-usuario&quot;)))
+</code></pre>
+<h3>Screenshot (útil para debugar automações headless)</h3>
+<pre><code class="language-python">driver.save_screenshot(&quot;debug.png&quot;)
+</code></pre>
+<h3>Downloads via Selenium</h3>
+<p>Configurar a pasta de download padrão do navegador:</p>
+<pre><code class="language-python">opcoes = Options()
+opcoes.add_experimental_option(&quot;prefs&quot;, {
+    &quot;download.default_directory&quot;: &quot;/caminho/para/downloads&quot;,
+    &quot;download.prompt_for_download&quot;: False,
+})
+driver = webdriver.Chrome(options=opcoes)
+</code></pre>
+<p>Depois disso, um clique em link de download salva direto na pasta configurada — o Selenium não "recebe" o arquivo diretamente, então normalmente você espera o arquivo aparecer na pasta (checando existência em loop com um timeout, similar ao padrão de espera).</p>
+<h3>Fechando corretamente (evitar processos zumbis do navegador)</h3>
+<pre><code class="language-python">try:
+    driver.get(url)
+    ...
+finally:
+    driver.quit()
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 25</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>abrir navegador</td>
+<td><code>webdriver.Chrome()</code></td>
+</tr>
+<tr>
+<td>modo headless</td>
+<td><code>options.add_argument("--headless=new")</code></td>
+</tr>
+<tr>
+<td>ir para URL</td>
+<td><code>driver.get(url)</code></td>
+</tr>
+<tr>
+<td>achar um elemento</td>
+<td><code>driver.find_element(By.ID, "x")</code></td>
+</tr>
+<tr>
+<td>achar vários</td>
+<td><code>driver.find_elements(By.CLASS_NAME, "x")</code></td>
+</tr>
+<tr>
+<td>digitar em campo</td>
+<td><code>elemento.send_keys("texto")</code></td>
+</tr>
+<tr>
+<td>clicar</td>
+<td><code>elemento.click()</code></td>
+</tr>
+<tr>
+<td>selecionar dropdown</td>
+<td><code>Select(elemento).select_by_visible_text("x")</code></td>
+</tr>
+<tr>
+<td>esperar elemento aparecer</td>
+<td><code>WebDriverWait(driver, 10).until(EC.presence_of_element_located(...))</code></td>
+</tr>
+<tr>
+<td>tirar screenshot</td>
+<td><code>driver.save_screenshot("arquivo.png")</code></td>
+</tr>
+<tr>
+<td>fechar navegador</td>
+<td><code>driver.quit()</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-26"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-26</span><span class="mod-title">Geração de documentos (PDF e Word)</span></h2>
+<h3>Word com <code>python-docx</code></h3>
+<pre><code class="language-python">from docx import Document
+
+doc = Document()
+doc.add_heading(&quot;Relatório de Vendas&quot;, level=1)
+doc.add_paragraph(&quot;Resumo do período de agosto de 2026.&quot;)
+
+doc.add_heading(&quot;Resultados por categoria&quot;, level=2)
+paragrafo = doc.add_paragraph()
+paragrafo.add_run(&quot;Total geral: &quot;).bold = True
+paragrafo.add_run(&quot;R$ 45.320,00&quot;)
+
+doc.save(&quot;relatorio.docx&quot;)
+</code></pre>
+<h3>Tabelas em Word</h3>
+<pre><code class="language-python">tabela = doc.add_table(rows=1, cols=3)
+tabela.style = &quot;Light Grid Accent 1&quot;
+
+cabecalho = tabela.rows[0].cells
+cabecalho[0].text, cabecalho[1].text, cabecalho[2].text = &quot;Categoria&quot;, &quot;Total&quot;, &quot;Qtd&quot;
+
+for linha in resumo:
+    celulas = tabela.add_row().cells
+    celulas[0].text = str(linha[&quot;categoria&quot;])
+    celulas[1].text = f&quot;R$ {linha['total']:.2f}&quot;
+    celulas[2].text = str(linha[&quot;quantidade&quot;])
+
+doc.save(&quot;relatorio.docx&quot;)
+</code></pre>
+<h3>Lendo um Word existente</h3>
+<pre><code class="language-python">doc = Document(&quot;relatorio_existente.docx&quot;)
+for paragrafo in doc.paragraphs:
+    print(paragrafo.text)
+</code></pre>
+<h3>Preenchendo um template Word com dados (o caso mais comum em automação)</h3>
+<p><code>python-docx</code> puro não tem substituição de variável nativa — para templates com placeholders (<code>{{ nome }}</code>), use <strong><code>docxtpl</code></strong>, que aplica sintaxe Jinja2 dentro do <code>.docx</code>:</p>
+<pre><code class="language-python">from docxtpl import DocxTemplate
+
+template = DocxTemplate(&quot;modelo_contrato.docx&quot;)     # arquivo Word com {{ cliente }}, {{ valor }} etc.
+template.render({
+    &quot;cliente&quot;: &quot;João da Silva&quot;,
+    &quot;valor&quot;: &quot;R$ 1.200,00&quot;,
+    &quot;data&quot;: &quot;11/08/2026&quot;,
+})
+template.save(&quot;contrato_joao.docx&quot;)
+</code></pre>
+<p>No arquivo <code>modelo_contrato.docx</code>, você escreve normalmente no Word e insere <code>{{ cliente }}</code> onde quiser que o valor entre — o <code>docxtpl</code> também suporta laços (<code>{% for item in itens %}</code>) para tabelas dinâmicas.</p>
+<h3>PDF com <code>reportlab</code> (controle fino de layout)</h3>
+<pre><code class="language-python">from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+
+c = canvas.Canvas(&quot;relatorio.pdf&quot;, pagesize=A4)
+largura, altura = A4
+
+c.setFont(&quot;Helvetica-Bold&quot;, 16)
+c.drawString(50, altura - 50, &quot;Relatório de Vendas&quot;)
+
+c.setFont(&quot;Helvetica&quot;, 11)
+c.drawString(50, altura - 80, &quot;Período: agosto de 2026&quot;)
+
+y = altura - 120
+for linha in resumo:
+    c.drawString(50, y, f&quot;{linha['categoria']}: R$ {linha['total']:.2f}&quot;)
+    y -= 18
+
+c.save()
+</code></pre>
+<p><code>reportlab</code> trabalha com coordenadas (x, y) a partir do canto inferior esquerdo da página — é mais verboso, mas dá controle total de posicionamento.</p>
+<h3>PDF a partir de HTML (mais prático para relatórios com layout rico)</h3>
+<p>Quando o relatório é complexo (tabelas, cores, várias seções), geralmente é mais rápido montar um HTML/CSS e converter para PDF do que posicionar elemento por elemento no <code>reportlab</code>:</p>
+<pre><code class="language-python">from weasyprint import HTML
+
+html_content = f&quot;&quot;&quot;
+&lt;html&gt;
+&lt;head&gt;&lt;style&gt;
+  body {{ font-family: sans-serif; }}
+  h1 {{ color: #2c3e50; }}
+  table {{ width: 100%; border-collapse: collapse; }}
+  td, th {{ border: 1px solid #ccc; padding: 6px; }}
+&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Relatório de Vendas&lt;/h1&gt;
+  &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Categoria&lt;/th&gt;&lt;th&gt;Total&lt;/th&gt;&lt;/tr&gt;
+    {&quot;&quot;.join(f&quot;&lt;tr&gt;&lt;td&gt;{l['categoria']}&lt;/td&gt;&lt;td&gt;R$ {l['total']:.2f}&lt;/td&gt;&lt;/tr&gt;&quot; for l in resumo)}
+  &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&quot;&quot;&quot;
+
+HTML(string=html_content).write_pdf(&quot;relatorio.pdf&quot;)
+</code></pre>
+<h3>Extraindo texto e dados de PDF com <code>pypdf</code></h3>
+<pre><code class="language-python">from pypdf import PdfReader
+
+leitor = PdfReader(&quot;documento.pdf&quot;)
+for pagina in leitor.pages:
+    texto = pagina.extract_text()
+    print(texto)
+
+len(leitor.pages)          # número de páginas
+</code></pre>
+<p><strong>Nota:</strong> extração de texto de PDF funciona bem para PDFs gerados digitalmente. PDFs escaneados (imagem) exigem OCR (ex.: <code>pytesseract</code>) — <code>pypdf</code> sozinho não lê imagem.</p>
+<h3>Juntando e separando PDFs</h3>
+<pre><code class="language-python">from pypdf import PdfReader, PdfWriter
+
+writer = PdfWriter()
+for arquivo in [&quot;parte1.pdf&quot;, &quot;parte2.pdf&quot;, &quot;parte3.pdf&quot;]:
+    leitor = PdfReader(arquivo)
+    for pagina in leitor.pages:
+        writer.add_page(pagina)
+
+with open(&quot;consolidado.pdf&quot;, &quot;wb&quot;) as f:
+    writer.write(f)
+</code></pre>
+<p><strong>CONSULTA RÁPIDA — Módulo 26</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>criar Word do zero</td>
+<td><code>Document()</code> → <code>.add_heading()</code> / <code>.add_paragraph()</code> → <code>.save()</code></td>
+</tr>
+<tr>
+<td>adicionar tabela no Word</td>
+<td><code>doc.add_table(rows=1, cols=n)</code></td>
+</tr>
+<tr>
+<td>preencher template Word</td>
+<td><code>docxtpl.DocxTemplate(caminho).render(dados)</code></td>
+</tr>
+<tr>
+<td>criar PDF simples (canvas)</td>
+<td><code>reportlab.pdfgen.canvas.Canvas(caminho)</code></td>
+</tr>
+<tr>
+<td>gerar PDF a partir de HTML</td>
+<td><code>weasyprint.HTML(string=html).write_pdf(caminho)</code></td>
+</tr>
+<tr>
+<td>extrair texto de PDF</td>
+<td><code>pypdf.PdfReader(caminho).pages[i].extract_text()</code></td>
+</tr>
+<tr>
+<td>juntar PDFs</td>
+<td><code>PdfWriter()</code> + <code>add_page()</code> em loop</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><a id="modulo-27"></a></p>
+<h2 class="module-heading"><span class="mod-badge">M-27</span><span class="mod-title">Pipelines de dados e dashboards</span></h2>
+<h3>Desenhando um pipeline de dados (retomando o Módulo 2, agora com estrutura de produção)</h3>
+<pre><code>FONTES (CSV, API, banco) 
+    ↓
+EXTRAÇÃO (ler cada fonte)
+    ↓
+VALIDAÇÃO (schema, tipos, nulos)
+    ↓
+TRANSFORMAÇÃO (limpar, calcular, padronizar)
+    ↓
+CARGA (salvar em banco/arquivo consolidado)
+    ↓
+DASHBOARD (ler o resultado consolidado, nunca as fontes brutas)
+</code></pre>
+<p><strong>Regra prática:</strong> o dashboard nunca deve processar dado bruto na hora de exibir — ele lê o resultado <strong>já tratado</strong> pelo pipeline. Isso separa "processamento pesado" (roda uma vez, agendado) de "visualização" (precisa ser rápida sempre que alguém abre a tela).</p>
+<h3>Estruturando o pipeline com as ferramentas já vistas</h3>
+<pre><code class="language-python"># pipeline.py
+from prefect import flow, task
+import pandas as pd
+import sqlite3
+
+@task(retries=2)
+def extrair_vendas():
+    return pd.read_csv(&quot;vendas.csv&quot;)
+
+@task
+def transformar(df):
+    df = df.dropna(subset=[&quot;valor&quot;])
+    df[&quot;valor&quot;] = df[&quot;valor&quot;].astype(float)
+    return df.groupby(&quot;categoria&quot;)[&quot;valor&quot;].sum().reset_index()
+
+@task
+def carregar(df):
+    with sqlite3.connect(&quot;dashboard.db&quot;) as conexao:
+        df.to_sql(&quot;resumo_vendas&quot;, conexao, if_exists=&quot;replace&quot;, index=False)
+
+@flow
+def pipeline_dashboard():
+    df = extrair_vendas()
+    resumo = transformar(df)
+    carregar(resumo)
+
+if __name__ == &quot;__main__&quot;:
+    pipeline_dashboard()
+</code></pre>
+<p>Isso pode ser agendado com <code>flow.serve(cron=...)</code> (Módulo 24) para rodar todo dia antes de alguém abrir o dashboard.</p>
+<h3>Dashboard com Streamlit (o caminho mais rápido para dashboards internos)</h3>
+<p>Testado com <strong>Streamlit 1.x</strong>.</p>
+<pre><code class="language-python"># app.py
+import streamlit as st
+import pandas as pd
+import sqlite3
+
+st.set_page_config(page_title=&quot;Dashboard de Vendas&quot;, layout=&quot;wide&quot;)
+st.title(&quot;Dashboard de Vendas&quot;)
+
+@st.cache_data(ttl=3600)          # evita reprocessar/reconsultar a cada interação
+def carregar_dados():
+    with sqlite3.connect(&quot;dashboard.db&quot;) as conexao:
+        return pd.read_sql(&quot;SELECT * FROM resumo_vendas&quot;, conexao)
+
+df = carregar_dados()
+
+categoria = st.sidebar.multiselect(&quot;Categoria&quot;, options=df[&quot;categoria&quot;].unique(), default=df[&quot;categoria&quot;].unique())
+df_filtrado = df[df[&quot;categoria&quot;].isin(categoria)]
+
+col1, col2 = st.columns(2)
+col1.metric(&quot;Total geral&quot;, f&quot;R$ {df_filtrado['valor'].sum():,.2f}&quot;)
+col2.metric(&quot;Categorias&quot;, len(df_filtrado))
+
+st.bar_chart(df_filtrado, x=&quot;categoria&quot;, y=&quot;valor&quot;)
+st.dataframe(df_filtrado, use_container_width=True)
+</code></pre>
+<p>Rodar: <code>streamlit run app.py</code> — abre automaticamente no navegador, com hot-reload a cada salvamento do arquivo.</p>
+<h3>Componentes mais usados do Streamlit</h3>
+<pre><code class="language-python">st.title(&quot;texto&quot;)            # título grande
+st.header(&quot;texto&quot;)            # título de seção
+st.write(qualquer_coisa)        # renderiza quase qualquer tipo (texto, df, dict...)
+st.metric(&quot;Label&quot;, valor)         # número em destaque, tipo KPI
+st.dataframe(df)                    # tabela interativa (ordenável, filtrável pelo usuário)
+st.table(df)                          # tabela estática
+
+st.selectbox(&quot;Escolha&quot;, opcoes)
+st.multiselect(&quot;Escolha vários&quot;, opcoes)
+st.slider(&quot;Intervalo&quot;, min_value=0, max_value=100)
+st.date_input(&quot;Data&quot;)
+st.file_uploader(&quot;Envie um arquivo&quot;)
+
+st.line_chart(df)
+st.bar_chart(df)
+st.plotly_chart(figura_plotly)        # gráficos mais elaborados via plotly
+
+st.sidebar.&lt;qualquer_componente&gt;        # coloca o componente na barra lateral em vez do corpo
+</code></pre>
+<h3>Gráficos mais elaborados com Plotly</h3>
+<pre><code class="language-python">import plotly.express as px
+
+fig = px.bar(df_filtrado, x=&quot;categoria&quot;, y=&quot;valor&quot;, color=&quot;categoria&quot;, title=&quot;Vendas por categoria&quot;)
+st.plotly_chart(fig, use_container_width=True)
+</code></pre>
+<p><code>plotly</code> também funciona fora do Streamlit (salvando como HTML ou imagem), útil se o gráfico precisar ir para um relatório (Módulo 26) em vez de um dashboard web.</p>
+<h3>Cache — por que importa</h3>
+<pre><code class="language-python">@st.cache_data(ttl=3600)     # guarda o resultado em cache por 1 hora
+def carregar_dados():
+    ...
+</code></pre>
+<p>Sem cache, o Streamlit <strong>reexecuta o script inteiro a cada interação</strong> do usuário (cada clique, cada filtro mudado). Para qualquer consulta a banco/API/arquivo grande, o cache é o que evita o dashboard ficar lento — essa é a causa mais comum de "meu dashboard trava" em quem está começando com Streamlit.</p>
+<h3>Quando Streamlit não é suficiente</h3>
+<p>Para dashboards com múltiplas páginas complexas, controle fino de layout/callbacks, ou uso corporativo com muitos usuários simultâneos, considere <strong>Dash</strong> (também Python, baseado em Plotly, mais verboso mas mais flexível) ou uma ferramenta de BI dedicada (Power BI, Metabase) alimentada pelo banco que seu pipeline já popula — nesse caso o pipeline Python continua sendo o mesmo, só muda a camada de visualização.</p>
+<p><strong>CONSULTA RÁPIDA — Módulo 27</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Quero fazer</th>
+<th>Sintaxe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rodar o dashboard</td>
+<td><code>streamlit run app.py</code></td>
+</tr>
+<tr>
+<td>cachear consulta pesada</td>
+<td><code>@st.cache_data(ttl=segundos)</code></td>
+</tr>
+<tr>
+<td>KPI em destaque</td>
+<td><code>st.metric("Label", valor)</code></td>
+</tr>
+<tr>
+<td>tabela interativa</td>
+<td><code>st.dataframe(df)</code></td>
+</tr>
+<tr>
+<td>gráfico simples</td>
+<td><code>st.bar_chart(df)</code></td>
+</tr>
+<tr>
+<td>gráfico avançado</td>
+<td><code>plotly.express</code> + <code>st.plotly_chart(fig)</code></td>
+</tr>
+<tr>
+<td>filtro na lateral</td>
+<td><code>st.sidebar.multiselect(...)</code></td>
+</tr>
+<tr>
+<td>pipeline agendado alimentando o dashboard</td>
+<td><code>@flow</code> do Prefect com <code>.serve(cron=...)</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><a id="padroes"></a></p>
+<h2>Catálogo de padrões de código</h2>
+<p>Blocos pequenos, comentados, prontos para copiar e adaptar.</p>
+<h3>Ler arquivo</h3>
+<pre><code class="language-python">from pathlib import Path
+
+# texto
+conteudo = Path(&quot;arquivo.txt&quot;).read_text(encoding=&quot;utf-8&quot;)
+
+# CSV como dicts
+import csv
+with open(&quot;arquivo.csv&quot;, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+    linhas = list(csv.DictReader(f))
+
+# JSON
+import json
+with open(&quot;arquivo.json&quot;, encoding=&quot;utf-8&quot;) as f:
+    dados = json.load(f)
+</code></pre>
+<h3>Salvar arquivo</h3>
+<pre><code class="language-python">Path(&quot;saida.txt&quot;).write_text(&quot;conteúdo&quot;, encoding=&quot;utf-8&quot;)
+
+with open(&quot;saida.csv&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+    escritor = csv.DictWriter(f, fieldnames=[&quot;a&quot;, &quot;b&quot;])
+    escritor.writeheader()
+    escritor.writerows(dados)
+
+with open(&quot;saida.json&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+    json.dump(dados, f, ensure_ascii=False, indent=2)
+</code></pre>
+<h3>Percorrer pasta</h3>
+<pre><code class="language-python">from pathlib import Path
+
+for arquivo in Path(&quot;pasta&quot;).glob(&quot;*.csv&quot;):        # um nível
+    ...
+
+for arquivo in Path(&quot;pasta&quot;).rglob(&quot;*.csv&quot;):        # recursivo
+    ...
+</code></pre>
+<h3>Filtrar dados</h3>
+<pre><code class="language-python"># lista de dicts
+validos = [item for item in dados if item.get(&quot;ativo&quot;)]
+
+# DataFrame
+validos = df[df[&quot;ativo&quot;] == True]
+</code></pre>
+<h3>Transformar dados</h3>
+<pre><code class="language-python"># lista de dicts
+nomes = [item[&quot;nome&quot;].strip().title() for item in dados]
+
+# DataFrame
+df[&quot;nome&quot;] = df[&quot;nome&quot;].str.strip().str.title()
+</code></pre>
+<h3>Agrupar dados</h3>
+<pre><code class="language-python"># sem pandas
+from collections import defaultdict
+grupos = defaultdict(list)
+for item in dados:
+    grupos[item[&quot;categoria&quot;]].append(item)
+
+# com pandas
+resumo = df.groupby(&quot;categoria&quot;)[&quot;valor&quot;].sum().reset_index()
+</code></pre>
+<h3>Fazer requisição</h3>
+<pre><code class="language-python">import requests
+
+response = requests.get(url, params=params, headers=headers, timeout=10)
+response.raise_for_status()
+dados = response.json()
+</code></pre>
+<h3>Tratar erro</h3>
+<pre><code class="language-python">try:
+    resultado = operacao_arriscada()
+except (ValueError, KeyError) as e:
+    logger.warning(f&quot;Falha esperada: {e}&quot;)
+    resultado = None
+except Exception:
+    logger.exception(&quot;Erro inesperado&quot;)
+    raise
+</code></pre>
+<h3>Processar vários arquivos</h3>
+<pre><code class="language-python">resultados = []
+for arquivo in Path(&quot;pasta_entrada&quot;).glob(&quot;*.csv&quot;):
+    try:
+        df = pd.read_csv(arquivo)
+        resultados.append(df)
+    except Exception as e:
+        logger.error(f&quot;Erro em {arquivo.name}: {e}&quot;)
+
+consolidado = pd.concat(resultados, ignore_index=True)
+</code></pre>
+<h3>Gerar relatório</h3>
+<pre><code class="language-python">resumo = df.groupby(&quot;categoria&quot;).agg(
+    total=(&quot;valor&quot;, &quot;sum&quot;),
+    quantidade=(&quot;valor&quot;, &quot;count&quot;),
+).reset_index()
+resumo.to_excel(&quot;relatorio.xlsx&quot;, index=False)
+</code></pre>
+<h3>Criar função (esqueleto padrão)</h3>
+<pre><code class="language-python">def nome_da_funcao(parametro: tipo) -&gt; tipo_retorno:
+    &quot;&quot;&quot;O que a função faz, em uma linha.&quot;&quot;&quot;
+    # corpo
+    return resultado
+</code></pre>
+<h3>Configurar logging</h3>
+<pre><code class="language-python">import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=&quot;%(asctime)s - %(levelname)s - %(message)s&quot;,
+    handlers=[logging.FileHandler(&quot;app.log&quot;, encoding=&quot;utf-8&quot;), logging.StreamHandler()],
+)
+logger = logging.getLogger(__name__)
+</code></pre>
+<h3>Ler configuração</h3>
+<pre><code class="language-python">import os
+from pathlib import Path
+import json
+
+# via variável de ambiente
+TOKEN = os.environ.get(&quot;API_TOKEN&quot;)
+
+# via arquivo json
+config = json.loads(Path(&quot;config.json&quot;).read_text(encoding=&quot;utf-8&quot;))
+</code></pre>
+<h3>Trabalhar com datas</h3>
+<pre><code class="language-python">from datetime import datetime, timedelta
+
+hoje = datetime.now()
+prazo = hoje + timedelta(days=30)
+data_formatada = hoje.strftime(&quot;%d/%m/%Y&quot;)
+data_lida = datetime.strptime(&quot;11/08/2026&quot;, &quot;%d/%m/%Y&quot;)
+</code></pre>
+<h3>Trabalhar com Excel</h3>
+<pre><code class="language-python">import pandas as pd
+
+df = pd.read_excel(&quot;planilha.xlsx&quot;, sheet_name=&quot;Dados&quot;)
+df.to_excel(&quot;saida.xlsx&quot;, index=False, sheet_name=&quot;Resultado&quot;)
+</code></pre>
+<h3>Trabalhar com CSV</h3>
+<pre><code class="language-python">df = pd.read_csv(&quot;dados.csv&quot;, encoding=&quot;utf-8&quot;)
+df.to_csv(&quot;saida.csv&quot;, index=False, encoding=&quot;utf-8&quot;)
+</code></pre>
+<h3>Trabalhar com JSON</h3>
+<pre><code class="language-python">import json
+dados = json.loads(texto_json)
+texto_json = json.dumps(dados, ensure_ascii=False, indent=2)
+</code></pre>
+<h3>Orquestrar um pipeline (Prefect)</h3>
+<pre><code class="language-python">from prefect import flow, task
+
+@task(retries=3, retry_delay_seconds=10)
+def etapa(x):
+    ...
+
+@flow
+def pipeline():
+    etapa(...)
+</code></pre>
+<h3>Automatizar navegador (Selenium)</h3>
+<pre><code class="language-python">from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+espera = WebDriverWait(driver, 10)
+elemento = espera.until(EC.presence_of_element_located((By.ID, &quot;x&quot;)))
+</code></pre>
+<h3>Preencher template de documento</h3>
+<pre><code class="language-python">from docxtpl import DocxTemplate
+template = DocxTemplate(&quot;modelo.docx&quot;)
+template.render(dados)
+template.save(&quot;saida.docx&quot;)
+</code></pre>
+<h3>Gerar relatório em PDF a partir de HTML</h3>
+<pre><code class="language-python">from weasyprint import HTML
+HTML(string=html_content).write_pdf(&quot;saida.pdf&quot;)
+</code></pre>
+<h3>Subir um dashboard rápido</h3>
+<pre><code class="language-python">import streamlit as st
+
+@st.cache_data(ttl=3600)
+def carregar_dados():
+    ...
+
+df = carregar_dados()
+st.dataframe(df)
+st.bar_chart(df)
+</code></pre>
+<hr />
+<p><a id="desafios"></a></p>
+<h2>Desafios progressivos</h2>
+<p>Não escolares. Progressivos em complexidade real de automação. Sem solução — o objetivo é você chegar até ela usando este manual.</p>
+<h3>Nível 1 — Organizador de arquivos</h3>
+<p><strong>Problema:</strong> você tem uma pasta com arquivos bagunçados de vários tipos.
+<strong>Requisitos:</strong> organizar automaticamente por extensão, em subpastas.
+<strong>Restrições:</strong> não pode sobrescrever arquivo existente com mesmo nome (renomear ou pular).
+<strong>Dados fictícios:</strong> pasta com <code>.pdf</code>, <code>.jpg</code>, <code>.csv</code>, <code>.docx</code>, alguns sem extensão.
+<strong>Resultado esperado:</strong> subpastas <code>pdf/</code>, <code>jpg/</code>, <code>csv/</code>, etc., cada uma com os arquivos correspondentes.
+<strong>Possíveis extensões:</strong> logar quantos arquivos foram movidos por tipo; ignorar arquivos ocultos.</p>
+<h3>Nível 2 — Processador de CSV</h3>
+<p><strong>Problema:</strong> um CSV de vendas tem linhas com dados inválidos (preço negativo, campos vazios, texto em vez de número).
+<strong>Requisitos:</strong> ler o CSV, validar linha por linha, separar válidas de inválidas, salvar dois arquivos de saída.
+<strong>Restrições:</strong> não pode quebrar o script se uma linha estiver malformada.
+<strong>Dados fictícios:</strong> CSV com colunas <code>produto, preco, quantidade</code>, algumas linhas com <code>preco</code> vazio ou negativo.
+<strong>Resultado esperado:</strong> <code>vendas_validas.csv</code> e <code>vendas_invalidas.csv</code>, com motivo da invalidação na segunda.
+<strong>Possíveis extensões:</strong> gerar um resumo (quantas válidas, quantas inválidas, motivo mais comum).</p>
+<h3>Nível 3 — Consolidador de várias planilhas</h3>
+<p><strong>Problema:</strong> uma pasta tem uma planilha Excel por mês (<code>jan.xlsx</code>, <code>fev.xlsx</code>, ...), todas com as mesmas colunas.
+<strong>Requisitos:</strong> juntar tudo em uma única tabela, identificando de qual mês cada linha veio.
+<strong>Restrições:</strong> planilhas podem ter colunas em ordem diferente; trate isso.
+<strong>Dados fictícios:</strong> 3-4 arquivos <code>.xlsx</code> com colunas <code>data, produto, valor</code>.
+<strong>Resultado esperado:</strong> um <code>consolidado.xlsx</code> com todos os dados e uma coluna extra <code>mes_origem</code>.
+<strong>Possíveis extensões:</strong> detectar e alertar se algum arquivo tem coluna faltando.</p>
+<h3>Nível 4 — Gerador automático de relatório</h3>
+<p><strong>Problema:</strong> a partir de uma base de dados de vendas, gerar um relatório executivo.
+<strong>Requisitos:</strong> total geral, total por categoria, top 5 produtos, tudo em um Excel formatado (cabeçalho em negrito, cores).
+<strong>Restrições:</strong> o relatório deve ser gerado com um único comando (<code>python gerar_relatorio.py</code>).
+<strong>Dados fictícios:</strong> base com <code>produto, categoria, valor, quantidade, data</code>.
+<strong>Resultado esperado:</strong> arquivo <code>.xlsx</code> com múltiplas abas: "Resumo", "Top Produtos", "Por Categoria".
+<strong>Possíveis extensões:</strong> adicionar gráfico; enviar o relatório por e-mail automaticamente.</p>
+<h3>Nível 5 — Consumidor de API</h3>
+<p><strong>Problema:</strong> consumir uma API pública paginada e salvar os dados localmente.
+<strong>Requisitos:</strong> paginação completa, tratamento de erro de rede, respeitar rate limit.
+<strong>Restrições:</strong> não pode perder dados se a API falhar no meio — salvar progresso incrementalmente.
+<strong>Dados fictícios:</strong> use uma API pública de teste (ex.: uma API REST de exemplo com paginação).
+<strong>Resultado esperado:</strong> um CSV/JSON com todos os registros coletados.
+<strong>Possíveis extensões:</strong> retry automático com backoff; log de quantas páginas foram coletadas.</p>
+<h3>Nível 6 — ETL completo</h3>
+<p><strong>Problema:</strong> dados brutos de múltiplas fontes (CSV + Excel) precisam virar uma base limpa e analisável.
+<strong>Requisitos:</strong> Extract (ler várias fontes), Transform (limpar, padronizar tipos, remover duplicatas), Load (salvar em SQLite).
+<strong>Restrições:</strong> o processo deve poder rodar de novo sem duplicar dados (idempotência básica).
+<strong>Dados fictícios:</strong> um CSV de clientes e um Excel de pedidos, com alguma inconsistência de formato entre eles.
+<strong>Resultado esperado:</strong> banco <code>dados.db</code> com tabelas limpas, prontas para consulta SQL.
+<strong>Possíveis extensões:</strong> logging detalhado de cada etapa; validação de integridade (pedido referencia cliente existente?).</p>
+<h3>Nível 7 — Automação combinada (arquivos + API + Pandas + Excel)</h3>
+<p><strong>Problema:</strong> todo dia, o sistema deve: ler arquivos novos de uma pasta, enriquecer os dados consultando uma API externa, consolidar tudo com Pandas, e gerar um relatório Excel formatado, com log completo da execução.
+<strong>Requisitos:</strong> todas as etapas anteriores combinadas em um único fluxo orquestrado.
+<strong>Restrições:</strong> deve ser resiliente — se a API falhar para um item, o processo continua para os demais e reporta no final quais falharam.
+<strong>Dados fictícios:</strong> arquivos CSV de pedidos + uma API fictícia de consulta de CEP/status de cliente.
+<strong>Resultado esperado:</strong> relatório final <code>.xlsx</code> + arquivo de log com o resumo da execução (quantos processados, quantos falharam, tempo total).
+<strong>Possíveis extensões:</strong> transformar em projeto estruturado (Módulo 19), com testes (Módulo 20) para as funções de transformação.</p>
+
+      <div class="doc-footer">
+        <span>Manual Pessoal de Python — Automação &amp; Dados</span>
+        <span>Feito para consulta durante o código, não para leitura linear</span>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Voltar ao topo">&uarr;</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+// ===== Mobile sidebar toggle =====
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+const menuBtn = document.getElementById('menuBtn');
+
+function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('open'); }
+function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+
+menuBtn?.addEventListener('click', () => {
+  sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+overlay?.addEventListener('click', closeSidebar);
+sidebar?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeSidebar));
+
+// ===== Sidebar search filter =====
+const searchInput = document.getElementById('searchInput');
+const navLinks = Array.from(document.querySelectorAll('nav.toc a'));
+
+searchInput?.addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  navLinks.forEach(link => {
+    const text = link.textContent.toLowerCase();
+    link.style.display = text.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-group-label').forEach(label => {
+    label.style.display = q ? 'none' : '';
+  });
+});
+
+// ===== Scroll spy =====
+const sections = navLinks
+  .map(a => document.querySelector(a.getAttribute('href')))
+  .filter(Boolean);
+
+const spy = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const id = '#' + entry.target.id;
+    const link = navLinks.find(a => a.getAttribute('href') === id);
+    if (!link) return;
+    if (entry.isIntersecting){
+      navLinks.forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px' });
+
+sections.forEach(s => spy.observe(s));
+
+// ===== Copy buttons on code blocks =====
+document.querySelectorAll('main pre').forEach(pre => {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'code-block';
+  pre.parentNode.insertBefore(wrapper, pre);
+  wrapper.appendChild(pre);
+
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.type = 'button';
+  btn.textContent = 'copiar';
+  wrapper.appendChild(btn);
+
+  btn.addEventListener('click', async () => {
+    const code = pre.querySelector('code')?.textContent ?? pre.textContent;
+    try {
+      await navigator.clipboard.writeText(code);
+      btn.textContent = 'copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copiar'; btn.classList.remove('copied'); }, 1500);
+    } catch (err) {
+      btn.textContent = 'erro';
+    }
+  });
+});
+
+// ===== Back to top =====
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('visible', window.scrollY > 600);
+});
+backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// ===== Syntax highlighting =====
+if (window.hljs) { hljs.highlightAll(); }
+
+</script>
+</body>
+</html>

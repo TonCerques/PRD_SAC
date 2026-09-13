@@ -1,0 +1,170 @@
+CREATE TABLE TAB_CLIENTE(
+    ID_CLIENTE SERIAL PRIMARY KEY NOT NULL,
+    NOME_CLIENTE VARCHAR(50),
+    CPF_CLIENTE VARCHAR(11) NOT NULL UNIQUE CHECK(LENGTH(CPF_CLIENTE) = 11),
+    DATA_NASCIMENTO DATE NOT NULL
+);
+
+CREATE TABLE TAB_SERVICOS(
+    ID_SERV INTEGER PRIMARY KEY,
+    TIPO_SERV VARCHAR(50),
+    PRECO_SERVICO NUMERIC(10,2)
+);
+
+CREATE TABLE TAB_FUNCIONARIO(
+    ID_FUNC SERIAL PRIMARY  KEY NOT NULL,
+    NOME_FUNC VARCHAR(50) NOT NULL,
+    MATRICULA VARCHAR(7) NOT NULL UNIQUE  CHECK(LENGTH(MATRICULA) = 7),
+    DATA_NASCIMENTO DATE NOT NULL 
+);
+
+
+CREATE TABLE PRD_ATENDIMENTO(
+    ID_ATEND SERIAL PRIMARY KEY NOT NULL,
+    STATUS_ATEND VARCHAR(50) DEFAULT 'ABERTO',
+    VALIDADE_ATEND TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    MOTIVO_ATEND TEXT,
+    FEEDBACK INT NOT NULL CHECK(FEEDBACK >=0),
+    PROTOCOLO VARCHAR(15) DEFAULT 'XXXXX.000.000-0', -- O TEMPLATE SERÁ UM SUFIXO DO TIPO DE SERVIÇO NO PROTOCOLO
+    TEMPO_ATEND INT NOT NULL CHECK (TEMPO_ATEND >= 0),
+    ID_FK_CLIENTE BIGINT UNSIGNED,
+    ID_FK_FUNC BIGINT UNSIGNED,
+    CONSTRAINT FK_CLIENTE FOREIGN KEY(ID_FK_CLIENTE) REFERENCES TAB_CLIENTE(ID_CLIENTE),
+    CONSTRAINT FK_FUNC FOREIGN KEY(ID_FK_FUNC) REFERENCES TAB_FUNCIONARIO(ID_FUNC)
+  );
+
+CREATE TABLE TAB_ITENS_SERV(
+    ID_ITENS_SERV SERIAL PRIMARY KEY,
+    VALIDACAO VARCHAR(50),
+    CONFERENCIA VARCHAR(50),
+    BIOMETRIA_DIGITAL VARCHAR(50), 
+    ID_FK_SERVICO INT NOT NULL,
+    CONSTRAINT ID_FK_SERVICE FOREIGN KEY (ID_FK_SERVICO) REFERENCES TAB_SERVICOS(ID_SERV)
+);
+
+
+CREATE TABLE TAB_ITENS_ATEND(
+    ID_ITENS_ATEND SERIAL PRIMARY KEY,
+    MOTIVO_PADRAO VARCHAR(250),
+    RESPOSTA_PADRAO VARCHAR(250),
+    ID_FK_SERV INT NOT NULL,
+    CONSTRAINT FK_SERV FOREIGN KEY (ID_FK_SERV) REFERENCES TAB_SERVICOS(ID_SERV),
+    ID_FK_ITEM_SERV BIGINT UNSIGNED NOT NULL,
+    CONSTRAINT AUX_ITEM_SERV_FK FOREIGN KEY(ID_FK_ITEM_SERV) REFERENCES TAB_ITENS_SERV(ID_ITENS_SERV)
+);
+
+CREATE TABLE AUX_ITENS_ATEND(
+    ID_FK_ATEND BIGINT UNSIGNED NOT NULL,
+    CONSTRAINT AUX_FK_ATEND FOREIGN KEY(ID_FK_ATEND) REFERENCES PRD_ATENDIMENTO(ID_ATEND),
+    ID_FK_ITENS BIGINT UNSIGNED NOT NULL,
+    CONSTRAINT FK_AUX_ITENS FOREIGN KEY(ID_FK_ITENS) REFERENCES TAB_ITENS_ATEND(ID_ITENS_ATEND)
+);
+
+
+CREATE TABLE AUX_SERV_ATEND(
+    ID_FK_SERV INT NOT NULL,
+    CONSTRAINT FK_AUX_SERV FOREIGN KEY(ID_FK_SERV) REFERENCES TAB_SERVICOS(ID_SERV),
+    ID_FK_ATEND BIGINT UNSIGNED  NOT NULL,
+    CONSTRAINT FK_AUX_ATEND FOREIGN KEY(ID_FK_ATEND) REFERENCES PRD_ATENDIMENTO(ID_ATEND)
+);
+
+
+INSERT INTO PRD_SAC.TAB_CLIENTE(NOME_CLIENTE, CPF_CLIENTE, DATA_NASCIMENTO)
+VALUES
+('TASHA SANTOS', '53920184726', '2004-06-12'),
+('GUSTAVO AMORIM', '10485937261', '1995-09-18'),
+('GABY LOURENÇO', '84729103658', '1994-08-10'),
+('MICHEL TEOBALDO', '29581047213', '2004-06-03'),
+('WELLINGTON CERQUEIRA', '71048293654', '1997-03-21'),
+('JOSENEIDE MARQUES', '48295107386', '1986-12-31'),
+('ZELIA NILDES', '93018472516', '2002-06-15'),
+('HUGO RUFINO', '07456931842', '1994-05-14'),
+('RAFAEL SANTOS', '33919576420', '2004-06-12');
+
+INSERT INTO PRD_SAC.TAB_SERVICOS(ID_SERV, TIPO_SERV, PRECO_SERVICO)
+VALUES
+(1,'VALIDAÇÃO', 0),
+(2, 'CONFERENCIA', 170.0),
+(3,'BIOMETRIA_DIGITAL', 260.0);
+
+
+INSERT INTO PRD_SAC.TAB_ITENS_SERV(VALIDACAO, CONFERENCIA, BIOMETRIA_DIGITAL, ID_FK_SERVICO)
+VALUES
+    ('Validação de agendamento de conferência', NULL, NULL, 1),
+    ('Validação de atendimento', NULL, NULL, 1),
+    ('Validação de acesso à conferência', NULL, NULL, 1),
+    ('Validação de biometria', NULL, NULL, 1);
+
+INSERT INTO PRD_SAC.TAB_ITENS_SERV(VALIDACAO, CONFERENCIA, BIOMETRIA_DIGITAL, ID_FK_SERVICO)
+VALUES
+    (NULL, 'Conferência E-CPF', NULL, 2),
+    (NULL, 'Conferência E-CNPJ', NULL, 2),
+    (NULL, 'Videoconferência de E-CPF', NULL, 2),
+    (NULL, 'Videoconferência de E-CNPJ', NULL, 2),
+    (NULL, 'Videoconferência de Retentativa E-CPF', NULL, 2),
+    (NULL, 'Videoconferência de Retentativa E-CNPJ', NULL, 2);
+
+INSERT INTO PRD_SAC.TAB_ITENS_SERV(VALIDACAO, CONFERENCIA, BIOMETRIA_DIGITAL, ID_FK_SERVICO)
+VALUES
+    (NULL, NULL, 'E-CPF', 3),
+    (NULL, NULL, 'E-CNPJ', 3),
+    (NULL, NULL, 'Biometria E-CPF', 3),
+    (NULL, NULL, 'Biometria E-CNPJ', 3),
+    (NULL, NULL, 'Biometria de Retentativa E-CPF', 3),
+    (NULL, NULL, 'Biometria de Retentativa E-CNPJ', 3);
+  
+
+INSERT INTO PRD_SAC.TAB_FUNCIONARIO(NOME_FUNC, MATRICULA, DATA_NASCIMENTO)
+VALUES 
+    ('Carlos Eduardo Souza', 'B202601', '1988-04-15'),
+    ('Mariana Costa Lima', 'B202602', '1993-09-22'),
+    ('Ricardo Alves Pereira', 'B202603', '1985-11-05'),
+    ('Ana Beatriz Ribeiro', 'B202604', '1995-02-18'),
+    ('Fernando Jorge Silva', 'B202605', '1990-07-30'),
+    ('Camila Oliveira Melo', 'B202606', '1997-12-12'),
+    ('Lucas Gabriel Santos', 'B202607', '1983-05-25'),
+    ('Juliana Martins Rocha', 'B202608', '1992-10-08'),
+    ('Rodrigo Augusto Lima', 'B202609', '1989-03-14'),
+    ('Patrícia Nunes Costa', 'B202610', '1996-08-27');
+
+
+INSERT INTO PRD_SAC.PRD_ATENDIMENTO(
+    STATUS_ATEND,
+    VALIDADE_ATEND,
+    MOTIVO_ATEND,
+    FEEDBACK,
+    PROTOCOLO,
+    TEMPO_ATEND,
+    ID_FK_CLIENTE,
+    ID_FK_FUNC
+)
+VALUES 
+    ('Concluído', '2026-09-14 14:00:00', 'Validação do código de acesso', 5, 'VALID.000.001-0', 12, 1, 5),
+    ('ABERTO', '2026-09-15 10:30:00', 'Solicitação de Biometria', 0, 'BIOME.000.002-0', 25, 2, 2),
+    ('Cancelado', '2026-09-07 11:15:00', 'Realização da videoconferência', 1, 'CONFE.000.003-0', 8, 3, 9),
+    ('Concluído', '2026-09-14 09:00:00', 'Alteração cadastral', 4, 'VALID.000.004-0', 5, 4, 4),
+    ('ABERTO', '2026-09-20 16:45:00', 'Realização da videoconferência', 2, 'CONFE.000.005-0', 15, 5, 1),
+    ('Concluído', '2026-09-14 15:20:00', 'Realização da videoconferência', 5, 'CONFE.000.006-0', 4, 6, 7),
+    ('ABERTO', '2026-09-16 08:00:00', 'Reclamação de serviço da conferência', 3, 'VALID.000.007-0', 30, 7, 3);
+
+INSERT INTO AUX_SERV_ATEND(ID_FK_SERV, ID_FK_ATEND)
+VALUES
+(1, 1),
+(3, 2),
+(2, 3),
+(1, 4),
+(2, 5),
+(2, 6),
+(1, 7);
+
+
+INSERT INTO PRD_SAC.TAB_ITENS_ATEND(MOTIVO_PADRAO,RESPOSTA_PADRAO,ID_FK_SERV,ID_FK_ITEM_SERV)
+VALUES
+    ('Perdi meu código de acesso', 'Refaça a conferência para recuperar o acesso.', 1, 3),
+    ('Não recebi o código de acesso', 'Solicite um novo código de acesso ao atendimento.', 1, 3),
+    ('Não consigo validar meu atendimento', 'Confira os dados informados e tente realizar a validação novamente.', 1, 2),
+    ('Não consigo realizar a conferência', 'Verifique seus documentos e tente iniciar a conferência novamente.', 2, 5),
+    ('A conferência foi recusada', 'Revise os dados enviados e realize uma nova conferência.', 2, 6),
+    ('A videoconferência foi interrompida', 'Aguarde o contato da equipe para realizar uma nova tentativa.', 2, 7),
+    ('A biometria não foi reconhecida', 'Limpe a câmera e repita o procedimento de biometria.', 3, 11),
+    ('Preciso repetir a biometria', 'Siga as instruções na tela e faça uma nova tentativa de biometria.', 3, 15);

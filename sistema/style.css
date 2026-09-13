@@ -1,0 +1,186 @@
+:root {
+  --bg-body: #f4f7f6;
+  --bg-card: #ffffff;
+  --text-main: #2d3748;
+  --text-muted: #718096;
+  --primary: #3182ce;
+  --primary-hover: #2b6cb0;
+  --border-color: #e2e8f0;
+  
+  /* Status Colors */
+  --st-aberto-bg: #ebf8ff;
+  --st-aberto-txt: #2b6cb0;
+  --st-atend-bg: #fefcbf;
+  --st-atend-txt: #975a16;
+  --st-concl-bg: #c6f6d5;
+  --st-concl-txt: #22543d;
+  --st-exp-bg: #fed7d7;
+  --st-exp-txt: #9b2c2c;
+  --st-canc-bg: #edf2f7;
+  --st-canc-txt: #4a5568;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container / Cards */
+.container, form, table {
+  width: 100%;
+  max-width: 900px;
+}
+
+form, .card {
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+}
+
+/* Typography & Titles */
+h2, h3 {
+  margin-bottom: 1.5rem;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* Forms & Inputs */
+.form-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #fff;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Buttons */
+button, .btn {
+  display: inline-block;
+  background-color: var(--primary);
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover, .btn:hover {
+  background-color: var(--primary-hover);
+}
+
+button:active, .btn:active {
+  transform: scale(0.98);
+}
+
+/* Table Design */
+table {
+  background: var(--bg-card);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+}
+
+th {
+  background-color: #f7fafc;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+td {
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: #f8fafc;
+}
+
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.st-ABERTO { background: var(--st-aberto-bg); color: var(--st-aberto-txt); }
+.st-EM-ATENDIMENTO { background: var(--st-atend-bg); color: var(--st-atend-txt); }
+.st-CONCLUÍDO { background: var(--st-concl-bg); color: var(--st-concl-txt); }
+.st-EXPIRADO { background: var(--st-exp-bg); color: var(--st-exp-txt); }
+.st-CANCELADO { background: var(--st-canc-bg); color: var(--st-canc-txt); }
+
+/* Utility Actions Link */
+td a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+td a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Conhecimento: Modelagem SQL e Sintaxes</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --sidebar-bg: #161b22;
+            --accent-color: #58a6ff;
+            --code-bg: #010409;
+            --border-color: #30363d;
+            --header-color: #ffffff;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; margin: 0; display: flex; }
+        nav { width: 300px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        nav h3 { color: var(--header-color); font-size: 1.2rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        nav ul { list-style: none; padding: 0; margin: 0; }
+        nav ul li { margin-bottom: 12px; }
+        nav ul li a { color: var(--text-color); text-decoration: none; font-size: 0.9rem; }
+        nav ul li a:hover { color: var(--accent-color); }
+        main { margin-left: 300px; padding: 40px 60px; max-width: 950px; width: 100%; box-sizing: border-box; }
+        h1, h2, h3 { color: var(--header-color); margin-top: 1.5em; }
+        h1 { font-size: 2.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        h2 { font-size: 1.7rem; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        pre { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 15px; overflow-x: auto; font-family: monospace; font-size: 0.9rem; color: #e6edf3; }
+        code { background-color: rgba(110, 118, 129, 0.4); padding: 0.2em 0.4em; border-radius: 6px; font-size: 0.9em; font-family: monospace; }
+        pre code { background-color: transparent; padding: 0; }
+        .keyword { color: #ff7b72; font-weight: bold; }
+        .type { color: #79c0ff; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; font-style: italic; }
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 40px 0; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h3>Documentação</h3>
+        <ul>
+            <li><a href="#conceitos">1. Conceitos Fundamentais</a></li>
+            <li><a href="#metodologia">2. Passo a Passo de Modelagem</a></li>
+            <li><a href="#ddl">3. Sintaxes Básicas: DDL</a></li>
+            <li><a href="#dml">4. Sintaxes Básicas: DML</a></li>
+            <li><a href="#dql">5. Sintaxes Básicas: DQL</a></li>
+            <li><a href="#dcl">6. Sintaxes Básicas: DCL</a></li>
+            <li><a href="#boas-praticas">7. Boas Práticas (Cenário de Fila)</a></li>
+            <li><a href="#tipos-dados">Nova Seção: Tipos de Dados</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h1>Base de Conhecimento: Modelagem e Sintaxe SQL</h1>
+        <p>Material de consulta contendo as bases teóricas, metodologia lógica e templates de sintaxe para a estruturação de bancos de dados relacionais e sistemas de filas.</p>
+
+        <hr>
+
+        <h2 id="conceitos">1. Conceitos Fundamentais (Base Teórica)</h2>
+        <h3>Dado vs Informação vs SGBD</h3>
+        <ul>
+            <li><strong>Dado:</strong> Fato bruto, isolado. Ex: "2026-10-01", "EM_ESPERA".</li>
+            <li><strong>Informação:</strong> Dado processado com contexto. Ex: "O tempo médio de espera no dia 01/10 foi de 15 minutos".</li>
+            <li><strong>SGBD (Sistema Gerenciador):</strong> O software (PostgreSQL, MySQL) que aplica regras de concorrência, segurança e integridade sobre os arquivos de dados.</li>
+        </ul>
+
+        <h3>Formas Normais (Normalização)</h3>
+        <ul>
+            <li><strong>1FN (Atomicidade):</strong> Colunas não podem guardar listas ou múltiplos valores. Cada célula tem um único dado. A tabela precisa de uma Chave Primária (PK).</li>
+            <li><strong>2FN (Dependência Total):</strong> Aplica-se a tabelas com chaves compostas (N:N). Colunas não-chave devem depender de <em>toda</em> a chave primária, não de apenas um pedaço dela.</li>
+            <li><strong>3FN (Dependência Transitiva):</strong> Colunas não-chave não podem depender de outras colunas não-chave. Ex: Não guarde o "Nome do Cliente" na tabela de "Chamados", guarde apenas o "ID do Cliente".</li>
+        </ul>
+
+        <hr>
+
+        <h2 id="metodologia">2. Passo a Passo Lógico de Modelagem</h2>
+        <p>Metodologia recomendada para projetar seu sistema do zero antes de escrever qualquer código SQL:</p>
+        <ol>
+            <li><strong>Levantamento de Entidades (O que existe de forma independente?):</strong> Identifique objetos concretos. No seu caso: O Cliente existe por si só. O Serviço oferecido pela empresa existe por si só.</li>
+            <li><strong>Levantamento de Transações (O que acontece no sistema?):</strong> Identifique eventos gerados pela interação das entidades. Ex: Uma entrada na fila (Atendimento) é um evento. Um Feedback é um evento vinculado a um Atendimento.</li>
+            <li><strong>Mapeamento de Relacionamentos e Cardinalidade:</strong>
+                <ul>
+                    <li>1:1 (Ex: 1 Atendimento tem apenas 1 Feedback).</li>
+                    <li>1:N (Ex: 1 Cliente pode abrir N Atendimentos. A Chave Estrangeira vai para a tabela "N", ou seja, na tabela de Atendimentos).</li>
+                </ul>
+            </li>
+            <li><strong>Aplicação de Normalização:</strong> Revise o desenho. Há dados repetidos? Campos calculados sendo gravados? (Se sim, remova-os e deixe para extrair via SQL/Views).</li>
+            <li><strong>Criação Estrutural (Ordem de Dependência):</strong> Sempre crie as tabelas independentes primeiro (sem chaves estrangeiras), para que as tabelas dependentes (que possuem chaves estrangeiras) possam referenciá-las.</li>
+        </ol>
+
+        <hr>
+        <hr>
+<h2 id="tipos-dados">Secção Auxiliar: Tipos de Dados Essenciais (PostgreSQL)</h2>
+<p>A escolha exata do tipo de dado afeta diretamente a performance das queries, o consumo de disco e a integridade da sua regra de negócio.</p>
+
+<h3>1. Identificadores (Chaves e Numerações)</h3>
+<ul>
+    <li><code>SERIAL</code> / <code>BIGSERIAL</code>: Tipo inteiro de auto-incremento contínuo (1, 2, 3...). Usado exclusivamente para gerar Chaves Primárias (PK) de tabelas de catálogo/cadastros fixos (ex: <code>TAB_SERVICOS</code>, <code>TAB_FUNCIONARIOS</code>).</li>
+    <li><code>INTEGER</code> / <code>INT</code>: Número inteiro padrão. Utilizado em Chaves Estrangeiras (FK) para referenciar colunas que nasceram como <code>SERIAL</code> na tabela pai.</li>
+    <li><code>UUID</code> (Universally Unique Identifier): Um hash alfanumérico globalmente único (ex: <code>'550e8400-e29b-41d4-a716-446655440000'</code>). Padrão ouro moderno para Chaves Primárias de tabelas transacionais de alto volume (como <code>PRD_ATENDIMENTO</code>), pois impede predição de dados e conflitos em sistemas distribuídos.</li>
+</ul>
+
+<h3>2. Textos e Caracteres</h3>
+<ul>
+    <li><code>VARCHAR(n)</code>: Texto com limite dinâmico de caracteres (ex: <code>VARCHAR(11)</code> para CPF ou <code>VARCHAR(20)</code> para Protocolo). Se você salvar a palavra "Olá" em um <code>VARCHAR(20)</code>, o banco só ocupa espaço para 3 letras no HD.</li>
+    <li><code>CHAR(n)</code>: Texto de tamanho fixo. Se você criar <code>CHAR(11)</code> e inserir "Olá", o banco vai preencher o resto com 8 espaços em branco invisíveis. Use <strong>apenas</strong> para dados que sempre têm o tamanho exato (ex: UF de estado como <code>CHAR(2)</code>).</li>
+    <li><code>TEXT</code>: Texto longo sem limite predefinido de tamanho. Ideal para colunas como o comentário do feedback ou descrição detalhada do atendimento.</li>
+</ul>
+
+<h3>3. Tempo e Datas (Crucial para Filas e SLA)</h3>
+<ul>
+    <li><code>TIMESTAMP</code>: Armazena data e hora puras (ex: <code>2026-10-01 14:30:00</code>).</li>
+    <li><code>TIMESTAMP WITH TIME ZONE</code>: Armazena data, hora e o fuso horário geográfico. <strong>Obrigatório</strong> para sistemas de fila e controle de SLA, pois garante que se o cliente abrir o chamado em um estado e o servidor estiver em outro, o cálculo de minutos não quebre.</li>
+    <li><code>DATE</code>: Armazena apenas a data (Ano, Mês, Dia). Útil e mais leve para dados estáticos, como <code>DATA_NASCIMENTO</code> do cliente.</li>
+</ul>
+
+<h3>4. Valores Lógicos e Métricas</h3>
+<ul>
+    <li><code>BOOLEAN</code>: Armazena <code>TRUE</code> (verdadeiro) ou <code>FALSE</code> (falso). Excelente para verificações binárias de estado (ex: uma coluna <code>ativo</code> para saber se o funcionário não foi demitido).</li>
+    <li><code>NUMERIC(p, s)</code>: Números exatos com precisão e escala, onde <em>p</em> é o total de dígitos e <em>s</em> as casas após a vírgula. Ex: <code>NUMERIC(10, 2)</code> para armazenar um <code>PRECO_SERVICO</code>. Nunca use <code>FLOAT</code> ou <code>REAL</code> para valores monetários, pois o arredondamento na CPU pode perder centavos durante cálculos analíticos.</li>
+</ul>
+        
+
+        <h2 id="ddl">3. Sintaxes Básicas: DDL (Data Definition Language)</h2>
+        <p>Comandos para definir estruturas (Schemas, Tabelas, Tipos e Constraints).</p>
+
+<pre><span class="comment">-- 1. Criação de Schema (Organização Lógica)</span>
+<span class="keyword">CREATE SCHEMA IF NOT EXISTS</span> nome_schema;
+
+<span class="comment">-- 2. Template de Tabela Independente</span>
+<span class="keyword">CREATE TABLE</span> nome_schema.entidade_pai (
+    id <span class="type">SERIAL PRIMARY KEY</span>,
+    nome_campo <span class="type">VARCHAR(100) NOT NULL UNIQUE</span>,
+    ativo <span class="type">BOOLEAN DEFAULT TRUE</span>
+);
+
+<span class="comment">-- 3. Template de Tabela Dependente (Com Chaves Estrangeiras e Check)</span>
+<span class="keyword">CREATE TABLE</span> nome_schema.entidade_filha (
+    id <span class="type">SERIAL PRIMARY KEY</span>,
+    pai_id <span class="type">INT NOT NULL</span>,
+    status <span class="type">VARCHAR(20) DEFAULT</span> <span class="string">'INICIAL'</span>,
+    nota <span class="type">INT</span>,
+    
+    <span class="comment">-- Restrição de Integridade (Foreign Key)</span>
+    <span class="keyword">CONSTRAINT</span> fk_pai_filha <span class="keyword">FOREIGN KEY</span> (pai_id) 
+        <span class="keyword">REFERENCES</span> nome_schema.entidade_pai(id) 
+        <span class="keyword">ON DELETE RESTRICT</span>, <span class="comment">-- Impede apagar o pai se tiver filhos</span>
+        
+    <span class="comment">-- Restrição de Domínio (Check)</span>
+    <span class="keyword">CONSTRAINT</span> chk_nota_valida <span class="keyword">CHECK</span> (nota >= 1 <span class="keyword">AND</span> nota <= 5)
+);
+
+<span class="comment">-- 4. Alterações Estruturais (Manutenção)</span>
+<span class="keyword">ALTER TABLE</span> nome_schema.entidade_filha <span class="keyword">ADD COLUMN</span> data_criacao <span class="type">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>;
+<span class="keyword">ALTER TABLE</span> nome_schema.entidade_filha <span class="keyword">ALTER COLUMN</span> status <span class="keyword">TYPE VARCHAR(50)</span>;
+</pre>
+
+        <hr>
+
+        <h2 id="dml">4. Sintaxes Básicas: DML (Data Manipulation Language)</h2>
+        <p>Comandos para manipular os dados internos das tabelas.</p>
+
+<pre><span class="comment">-- 1. Inserção Básica e Retorno de ID gerado</span>
+<span class="keyword">INSERT INTO</span> nome_schema.entidade_pai (nome_campo) 
+<span class="keyword">VALUES</span> (<span class="string">'Serviço Alpha'</span>)
+<span class="keyword">RETURNING</span> id;
+
+<span class="comment">-- 2. Atualização de Estado (Exemplo lógico de transição)</span>
+<span class="keyword">UPDATE</span> nome_schema.entidade_filha
+<span class="keyword">SET</span> status = <span class="string">'FINALIZADO'</span>
+<span class="keyword">WHERE</span> id = 10 <span class="keyword">AND</span> status = <span class="string">'INICIAL'</span>; <span class="comment">-- Filtro atômico para evitar erros</span>
+
+<span class="comment">-- 3. UPSERT (Inserir se não existe, atualizar se existe - com base em chave única)</span>
+<span class="keyword">INSERT INTO</span> nome_schema.entidade_filha (id, pai_id, nota)
+<span class="keyword">VALUES</span> (1, 5, 4)
+<span class="keyword">ON CONFLICT</span> (id) 
+<span class="keyword">DO UPDATE SET</span> nota = EXCLUDED.nota; (Gera um UPSERT, em caso de existência, cria com dados novos).
+
+<span class="comment">-- 4. Exclusão (Cuidado com FKs em cascata/restrict)</span>
+<span class="keyword">DELETE FROM</span> nome_schema.entidade_filha <span class="keyword">WHERE</span> status = <span class="string">'CANCELADO'</span>;
+</pre>
+
+        <hr>
+
+        <h2 id="dql">5. Sintaxes Básicas: DQL (Data Query Language)</h2>
+        <p>Comandos focados na leitura, projeção e cruzamento de dados.</p>
+
+<pre><span class="comment">-- 1. Consulta com Cruzamento (JOIN) e Filtragem Temporal</span>
+<span class="keyword">SELECT</span> 
+    f.id,
+    p.nome_campo,
+    f.status
+<span class="keyword">FROM</span> nome_schema.entidade_filha f
+<span class="keyword">INNER JOIN</span> nome_schema.entidade_pai p <span class="keyword">ON</span> p.id = f.pai_id
+<span class="keyword">WHERE</span> f.data_criacao >= CURRENT_DATE - INTERVAL <span class="string">'7 days'</span>;
+
+<span class="comment">-- 2. Agregação (Calculando médias/totais dinamicamente)</span>
+<span class="keyword">SELECT</span> 
+    pai_id,
+    COUNT(*) <span class="keyword">AS</span> total_registros,
+    AVG(nota) <span class="keyword">AS</span> nota_media
+<span class="keyword">FROM</span> nome_schema.entidade_filha
+<span class="keyword">GROUP BY</span> pai_id
+<span class="keyword">HAVING</span> COUNT(*) > 5;
+
+<span class="comment">-- 3. Criação de View (Salvando a query complexa como tabela virtual)</span>
+<span class="keyword">CREATE OR REPLACE VIEW</span> nome_schema.vw_resumo_operacao <span class="keyword">AS</span>
+<span class="keyword">SELECT</span> ... (sua query aqui);
+</pre>
+
+        <hr>
+
+        <h2 id="dcl">6. Sintaxes Básicas: DCL (Data Control Language)</h2>
+        <p>Gestão de acessos. Ideal para limitar o que aplicações backend podem fazer no banco.</p>
+
+<pre><span class="comment">-- 1. Criação de um Papel (Role/Usuário)</span>
+<span class="keyword">CREATE ROLE</span> nome_sistema_api <span class="keyword">WITH LOGIN PASSWORD</span> <span class="string">'senha_segura'</span>;
+
+<span class="comment">-- 2. Concessão de Privilégios (GRANT)</span>
+<span class="keyword">GRANT USAGE ON SCHEMA</span> nome_schema <span class="keyword">TO</span> nome_sistema_api;
+<span class="keyword">GRANT SELECT, INSERT, UPDATE ON</span> nome_schema.entidade_filha <span class="keyword">TO</span> nome_sistema_api;
+
+<span class="comment">-- 3. Revogação de Privilégios (REVOKE) - Protegendo contra exclusão física</span>
+<span class="keyword">REVOKE DELETE ON</span> nome_schema.entidade_filha <span class="keyword">FROM</span> nome_sistema_api;
+</pre>
+
+        <hr>
+
+        <h2 id="boas-praticas">7. Boas Práticas (Aplicadas ao seu Escopo Lógico)</h2>
+        
+        <h3>O Auto-Relacionamento (Self-Referencing FK)</h3>
+        <p>Quando a regra de negócio diz: "Se expirar, gera um novo atendimento vinculado ao original", você não precisa de uma tabela separada. A tabela aponta para si mesma. A sintaxe base é:</p>
+        <pre><code class="language-sql">protocolo_origem_id INT,
+CONSTRAINT fk_reatendimento FOREIGN KEY (protocolo_origem_id) REFERENCES minha_tabela(id)</code></pre>
+        <p><em>Reflexão pro seu projeto:</em> Isso permite criar subqueries que verificam o histórico de um atendimento mapeando quem é o "pai" dele.</p>
+
+        <h3>O papel das Triggers (Automação de Timestamps e Auditoria)</h3>
+        <p>No banco de dados, Triggers servem para garantir regras invariáveis em tempo real. Se o seu sistema requer marcar a hora exata que um status mudou para <code>EM_ATENDIMENTO</code>, delegue isso ao SGBD via Trigger (gatilho), e não à aplicação em Python (que pode sofrer de latência de rede). A estrutura lógica de uma trigger exige criar uma Função Executável primeiro, e depois vinculá-la ao evento (<code>BEFORE UPDATE</code>) da tabela alvo.</p>
+
+        <h3>Filas em Banco Relacional: O Problema da Concorrência</h3>
+        <p>Se vários atendentes tentarem puxar o "próximo cliente da fila" ao mesmo tempo, um `SELECT` simples retornará o mesmo cliente para todos. O conceito técnico para evitar isso em PostgreSQL é usar travas de linha temporárias. Estude e aplique a cláusula: <code>SELECT ... FOR UPDATE SKIP LOCKED</code> na sua query de distribuição de fila.</p>
+
+    </main>
+</body>
+</html>
