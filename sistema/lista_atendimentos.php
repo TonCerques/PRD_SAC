@@ -1,7 +1,7 @@
 <?php
 include('conexao.php');
 
-mysqli_query($c, "UPDATE PRD_ATENDIMENTO SET STATUS_ATEND = 'EXPIRADO' WHERE STATUS_ATEND = 'ABERTO' AND VALIDADE_ATEND < NOW()");
+$pdo->query("UPDATE PRD_ATENDIMENTO SET STATUS_ATEND = 'EXPIRADO' WHERE STATUS_ATEND = 'ABERTO' AND VALIDADE_ATEND < CURRENT_TIMESTAMP");
 
 $sql = "SELECT 
             a.ID_ATEND, a.PROTOCOLO, a.STATUS_ATEND, a.VALIDADE_ATEND, a.MOTIVO_ATEND, a.FEEDBACK,
@@ -18,7 +18,7 @@ $sql = "SELECT
         GROUP BY a.ID_ATEND
         ORDER BY a.ID_ATEND DESC";
 
-$res = mysqli_query($c, $sql);
+$stmt = $pdo->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -44,7 +44,7 @@ $res = mysqli_query($c, $sql);
                 </tr>
             </thead>
             <tbody>
-                <?php while($r = mysqli_fetch_assoc($res)): 
+                <?php while ($r = $stmt->fetch()):
                     $sub_servico = $r['VALIDACAO'] ?? $r['CONFERENCIA'] ?? $r['BIOMETRIA_DIGITAL'] ?? 'Não especificado';
                 ?>
                 <tr>

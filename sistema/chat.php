@@ -23,14 +23,16 @@ $funcionario_respostas = [
 ];
 
 if ($step == 1) {
-    $sql_motivo = "SELECT ID_ITENS_ATEND, MOTIVO_PADRAO, RESPOSTA_PADRAO FROM TAB_ITENS_ATEND WHERE ID_FK_SERV = $id_serv ORDER BY RAND() LIMIT 1";
-    $res_motivo = mysqli_query($c, $sql_motivo);
-    $simulacao = mysqli_fetch_assoc($res_motivo);
+    $sql_motivo = "SELECT ID_ITENS_ATEND, MOTIVO_PADRAO, RESPOSTA_PADRAO FROM TAB_ITENS_ATEND WHERE ID_FK_SERV = :id_serv ORDER BY RANDOM() LIMIT 1";
+    $stmt_motivo = $pdo->prepare($sql_motivo);
+    $stmt_motivo->execute(['id_serv' => $id_serv]);
+    $simulacao = $stmt_motivo->fetch();
 
-    $sql_respostas = "SELECT RESPOSTA_PADRAO FROM TAB_ITENS_ATEND WHERE ID_FK_SERV = $id_serv ORDER BY RAND() LIMIT 10";
-    $res_respostas = mysqli_query($c, $sql_respostas);
+    $sql_respostas = "SELECT RESPOSTA_PADRAO FROM TAB_ITENS_ATEND WHERE ID_FK_SERV = :id_serv ORDER BY RANDOM() LIMIT 10";
+    $stmt_respostas = $pdo->prepare($sql_respostas);
+    $stmt_respostas->execute(['id_serv' => $id_serv]);
     $respostas_opcoes = [];
-    while($row = mysqli_fetch_assoc($res_respostas)) {
+    while ($row = $stmt_respostas->fetch()) {
         $respostas_opcoes[] = $row['RESPOSTA_PADRAO'];
     }
     if (!in_array($simulacao['RESPOSTA_PADRAO'], $respostas_opcoes)) {
@@ -53,14 +55,15 @@ if ($step == 1) {
     $respostas_opcoes = $funcionario_respostas;
     shuffle($respostas_opcoes);
 
-// chat.php (Alteração no Passo 3 para gerar feedback randômico de 1 a 5)
-
+    
 } elseif ($step == 3) {
     $id_item = $_POST['id_item_atend'];
     $feedback_cliente = rand(1, 5); // Gera nota aleatória do cliente
     
-    mysqli_query($c, "UPDATE PRD_ATENDIMENTO SET STATUS_ATEND = 'CONCLUÍDO', FEEDBACK = $feedback_cliente, TEMPO_ATEND = 10 WHERE ID_ATEND = $id_atend");
-    mysqli_query($c, "INSERT INTO AUX_ITENS_ATEND (ID_FK_ATEND, ID_FK_ITENS) VALUES ($id_atend, $id_item)");
+    $stmt = $pdo->prepare("UPDATE PRD_ATENDIMENTO SET STATUS_ATEND = 'CONCLUÍDO', FEEDBACK = :feedback, TEMPO_ATEND = 10 WHERE ID_ATEND = :id_atend");
+    $stmt->execute(['feedback' => $feedback_cliente, 'id_atend' => $id_atend]);
+    $stmt = $pdo->prepare("INSERT INTO AUX_ITENS_ATEND (ID_FK_ATEND, ID_FK_ITENS) VALUES (:id_atend, :id_item)");
+    $stmt->execute(['id_atend' => $id_atend, 'id_item' => $id_item]);
     
     header("Location: lista_atendimentos.php");
     exit;
