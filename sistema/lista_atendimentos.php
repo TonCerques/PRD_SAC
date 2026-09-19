@@ -56,14 +56,14 @@ $stmt = $pdo->query($sql);
                     
                     <!-- Exibição do Feedback em Estrelas -->
                     <td style="color: #eab308; font-size: 1.2rem;">
-                        <?= strtoupper($r['STATUS_ATEND']) === 'CONCLUÍDO' ? str_repeat('★', $r['FEEDBACK']) . str_repeat('☆', 5 - $r['FEEDBACK']) : '-' ?>
+                        <?= strtoupper($r['STATUS_ATEND']) === 'CONCLUÍDO' ? (int)$r['FEEDBACK'] : '-' ?>
                     </td>
 
-                    <td>
+                    <<td>
                         <?php if (strtoupper($r['STATUS_ATEND']) === 'ABERTO'): ?>
                             <a href="acoes.php?acao=assumir&id=<?= $r['ID_ATEND'] ?>"><button>Assumir</button></a>
                         <?php elseif (strtoupper($r['STATUS_ATEND']) === 'EM ATENDIMENTO'): ?>
-                            <a href="chat.php?id=<?= $r['ID_ATEND'] ?>&serv=<?= $r['ID_SERV'] ?>"><button style="background: #eab308;">Chat</button></a>
+                            <a href="chat.php?id=<?= $r['ID_ATEND'] ?>&serv=<?= $r['ID_SERV'] ?>" target="_blank"><button style="background: #eab308;">Chat</button></a>
                         <?php elseif (strtoupper($r['STATUS_ATEND']) === 'EXPIRADO'): ?>
                             <a href="acoes.php?acao=reatendimento&id=<?= $r['ID_ATEND'] ?>"><button style="background: #ef4444;">Reatender</button></a>
                         <?php else: ?>
