@@ -59,7 +59,7 @@ $stmt = $pdo->query($sql);
                         <?= strtoupper($r['STATUS_ATEND']) === 'CONCLUÍDO' ? (int)$r['FEEDBACK'] : '-' ?>
                     </td>
 
-                    <<td>
+                    <td>
                         <?php if (strtoupper($r['STATUS_ATEND']) === 'ABERTO'): ?>
                             <a href="acoes.php?acao=assumir&id=<?= $r['ID_ATEND'] ?>"><button>Assumir</button></a>
                         <?php elseif (strtoupper($r['STATUS_ATEND']) === 'EM ATENDIMENTO'): ?>
