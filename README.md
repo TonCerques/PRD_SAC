@@ -37,21 +37,21 @@ O ecossistema é dividido em três rotinas independentes operadas via Python e S
 Insere dinamicamente novos fluxos e solicitações de clientes simulando o tráfego de entrada no sistema.
 
 <p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/videos/disparar_clientes.mp4" width="100%" controls autoplay loop muted></video>
+  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/disparar_clientes.mp4?raw=true4" width="100%" controls autoplay loop muted></video>
 </p>
 
 ### 2. Processar Atendimentos
 O robô assume os chamados na fila, interage com as rotas de chat e altera os status de forma automatizada.
 
 <p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/videos/processar_atendimentos.mp4" width="100%" controls autoplay loop muted></video>
+  <video src="https://github.com/TonCerques/PRD_SAC/blob/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/processar_atendimento.mp4" width="100%" controls autoplay loop muted></video>
 </p>
 
 ### 3. Extrair Lista de Atendimentos
 Extrai os dados da tabela em tempo real e consolida as informações em estruturas tabulares para análise.
 
 <p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/videos/extrair_lista_atendimentos.mp4" width="100%" controls autoplay loop muted></video>
+  <video src="https://github.com/TonCerques/PRD_SAC/blob/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/extrair_lista_atendimentos.mp4" width="100%" controls autoplay loop muted></video>
 </p>
 
 ---
