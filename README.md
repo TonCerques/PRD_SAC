@@ -9,6 +9,7 @@ Processo de dados e automação de processos (RPA) para triagem, alteração de 
 O fluxo de automação integra o robô em Python com a aplicação web (PHP/MySQL) controlando a navegação, preenchimento de formulários e sincronização de estado do DOM.
 
 
+
 ```
 
 +------------------+         1. Extrai tabela de atendimentos e status         +--------------------------+
@@ -22,7 +23,6 @@ O fluxo de automação integra o robô em Python com a aplicação web (PHP/MySQ
 |                  | -- 4. Processa abertura, assumir e chat automático ------------> [ chat.php / acoes.php ]
 |                  |                                                                |
 |                  | <-- 5. Finaliza interação, atualiza status e limpa DOM --------+
-
 +------------------+
 
 ```
@@ -37,21 +37,21 @@ O ecossistema é dividido em três rotinas independentes operadas via Python e S
 Insere dinamicamente novos fluxos e solicitações de clientes simulando o tráfego de entrada no sistema.
 
 <p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/disparar_clientes.mp4?raw=true4" width="100%" controls autoplay loop muted></video>
+  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/disparar_clientes.mp4" width="100%" controls autoplay loop muted></video>
 </p>
 
 ### 2. Processar Atendimentos
 O robô assume os chamados na fila, interage com as rotas de chat e altera os status de forma automatizada.
 
 <p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/blob/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/processar_atendimento.mp4" width="100%" controls autoplay loop muted></video>
+  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/processar_atendimento.mp4" width="100%" controls autoplay loop muted></video>
 </p>
 
 ### 3. Extrair Lista de Atendimentos
 Extrai os dados da tabela em tempo real e consolida as informações em estruturas tabulares para análise.
 
 <p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/blob/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/extrair_lista_atendimentos.mp4" width="100%" controls autoplay loop muted></video>
+  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/extrair_lista_atendimentos.mp4" width="100%" controls autoplay loop muted></video>
 </p>
 
 ---
@@ -83,7 +83,7 @@ Extrai os dados da tabela em tempo real e consolida as informações em estrutur
 
 1. **Clone o repositório:**
 ```bash
-git clone https://github.com/TonCerques/PRD_SAC.git
+git clone [https://github.com/TonCerques/PRD_SAC.git](https://github.com/TonCerques/PRD_SAC.git)
 cd PRD_SAC 
 
 ```
@@ -118,4 +118,3 @@ python extrair_lista_webscrapping.py
 ```
 
 ```
-
