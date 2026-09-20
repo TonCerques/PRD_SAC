@@ -32,20 +32,24 @@ O fluxo de automação integra o robô em Python com a aplicação web (PHP/MySQ
 ## Demonstração das Automações
 
 O ecossistema é dividido em três rotinas independentes operadas via Python e Selenium:
+## Demonstração das Automações
+
+O ecossistema é dividido em três rotinas independentes operadas via Python e Selenium:
 
 ### 1. Disparar Clientes
 Insere dinamicamente novos fluxos e solicitações de clientes simulando o tráfego de entrada no sistema.
 
-<p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/disparar_clientes.mp4" width="100%" controls autoplay loop muted></video>
-</p>
+![Disparar Clientes](./Documentação%20de%20Estudo/disparar_clientes.gif)
 
 ### 2. Processar Atendimentos
 O robô assume os chamados na fila, interage com as rotas de chat e altera os status de forma automatizada.
 
-<p align="center">
-  <video src="https://github.com/TonCerques/PRD_SAC/raw/main/Documenta%C3%A7%C3%A3o%20de%20Estudo/processar_atendimento.mp4" width="100%" controls autoplay loop muted></video>
-</p>
+![Processar Atendimentos](./Documentação%20de%20Estudo/processar_atendimento.gif)
+
+### 3. Extrair Lista de Atendimentos
+Extrai os dados da tabela em tempo real e consolida as informações em estruturas tabulares para análise.
+
+![Extrair Lista de Atendimentos](./Documentação%20de%20Estudo/extrair_lista_atendimentos.gif)
 
 ### 3. Extrair Lista de Atendimentos
 Extrai os dados da tabela em tempo real e consolida as informações em estruturas tabulares para análise.
